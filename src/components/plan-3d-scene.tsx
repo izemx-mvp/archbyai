@@ -307,7 +307,9 @@ function Etage({
 
       {/* étiquettes de pièces */}
       {etiquettes &&
-        pieces.map((p, i) => (
+        pieces
+          .filter((p) => p.w * sx * p.h * sz > 7)
+          .map((p, i) => (
           <Html
             key={i}
             position={[p.x * sx - largeur / 2 + (p.w * sx) / 2, y + 1.4, p.y * sz - profondeur / 2 + (p.h * sz) / 2]}
@@ -322,7 +324,7 @@ function Etage({
               </span>
             </div>
           </Html>
-        ))}
+          ))}
     </group>
   );
 }
@@ -483,7 +485,6 @@ export default function Plan3DScene({
         camera={{ fov: 45, near: 0.1, far: 2000, position: [rayon, rayon * 0.8, rayon * 1.2] }}
       >
         <Suspense fallback={null}>
-          <color attach="background" args={[eclairage === "Froid" ? "#dfeaf6" : "#eef1f6"]} />
           <hemisphereLight intensity={lum.ciel} groundColor="#b9b2a5" />
           <directionalLight
             position={soleil}
@@ -495,6 +496,8 @@ export default function Plan3DScene({
             shadow-camera-right={rayon * 1.6}
             shadow-camera-top={rayon * 1.6}
             shadow-camera-bottom={-rayon * 1.6}
+            shadow-normalBias={0.04}
+            shadow-bias={-0.0005}
           />
           <Sky sunPosition={soleil} turbidity={6} rayleigh={eclairage === "Chaud" ? 3 : 1.2} />
           <Environment preset="city" />
