@@ -128,7 +128,7 @@ export function Plan2D({ simulation, etage }: { simulation: Simulation; etage: n
   const largeur = GRID_W * UNITE;
   const hauteur = GRID_H * UNITE;
   const echelle = Math.sqrt(simulation.superficie / simulation.etages / (GRID_W * GRID_H));
-  const metres = (u: number) => `${(u * UNITE * echelle * 0.0166 * 60) / 60 === 0 ? 0 : (u * echelle).toFixed(2)} m`;
+  const metres = (u: number) => `${(u * echelle).toFixed(2)} m`;
 
   const [vue, setVue] = useState({ x: 0, y: 0, z: 1 });
   const [survol, setSurvol] = useState<number | null>(null);
