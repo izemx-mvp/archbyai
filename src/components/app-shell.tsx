@@ -14,6 +14,7 @@ import {
   Plug,
   Search,
   Settings,
+  Sparkles,
   Sun,
   Users,
   UserCog,
