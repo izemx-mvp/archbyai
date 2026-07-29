@@ -124,7 +124,7 @@ function SidebarInner({ collapsed, onNavigate }: { collapsed: boolean; onNavigat
     <div className="flex h-full flex-col">
       <div className={cn("flex h-16 items-center", collapsed ? "justify-center px-0" : "px-4")}>
         <Link to="/" aria-label="ArchbyAI" onClick={onNavigate} className="rounded-xl">
-          {collapsed ? <BrandMark /> : <BrandLogo />}
+          {collapsed ? <BrandMark /> : <BrandLogo className="h-11" />}
         </Link>
       </div>
 

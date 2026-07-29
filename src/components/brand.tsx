@@ -16,7 +16,7 @@ export function BrandLogo({ className }: { className?: string }) {
         width={1536}
         height={512}
         decoding="async"
-        className="brand-logo-img h-8 w-auto max-w-full select-none object-contain object-left"
+        className="brand-logo-img h-full w-auto max-w-full select-none object-contain object-left"
       />
     </span>
   );
