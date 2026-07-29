@@ -110,7 +110,7 @@ function ConnexionPage() {
       <div className="flex min-h-screen items-center justify-center px-5 py-12 sm:px-10">
         <div className="w-full max-w-md animate-rise">
           <div className="mb-8 flex justify-center lg:justify-start">
-            <BrandLogo className="h-11" />
+            <BrandLogo className="h-14" />
           </div>
 
           <div className="glass rounded-3xl p-7 shadow-elevated sm:p-9">
