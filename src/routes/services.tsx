@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Cpu, Power, RefreshCw, Server } from "lucide-react";
 import { toast } from "sonner";
@@ -8,8 +8,10 @@ import { PageHeader } from "@/components/page-parts";
 import { StatusPill, type Tone } from "@/components/status-pill";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { services as initialServices, type ServiceItem } from "@/lib/mock-data";
+import { useData } from "@/lib/store";
+import type { ServiceItem } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/services")({
   head: () => ({
@@ -33,21 +35,51 @@ const statutMap: Record<ServiceItem["statut"], { label: string; tone: Tone }> = 
 };
 
 function ServicesPage() {
-  const [services, setServices] = useState(initialServices);
+  const { state, ready, basculerService, journaliser, notifier } = useData();
   const [busy, setBusy] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!ready) return;
+    const id = window.setTimeout(() => setLoading(false), 400);
+    return () => window.clearTimeout(id);
+  }, [ready]);
 
   const toggle = (svc: ServiceItem) => {
     setBusy(svc.id);
     window.setTimeout(() => {
-      const demarrage = svc.statut === "arrete";
-      setServices((prev) =>
-        prev.map((s) => (s.id === svc.id ? { ...s, statut: demarrage ? "en_cours" : "arrete" } : s)),
-      );
+      const suivant = basculerService(svc.id);
       setBusy(null);
-      if (demarrage) toast.success(`${svc.nom} démarré.`);
-      else toast.warning(`${svc.nom} arrêté.`);
-    }, 700);
+      journaliser({
+        api: svc.nom,
+        action: suivant === "en_cours" ? "POST /v1/services/start" : "POST /v1/services/stop",
+        utilisateur: "m.toufella",
+        code: 200,
+        duree: 640,
+      });
+      if (suivant === "en_cours") {
+        toast.success(`${svc.nom} démarré.`);
+        notifier({ titre: "Service démarré", detail: svc.nom, type: "success", to: "/services" });
+      } else {
+        toast.warning(`${svc.nom} arrêté.`);
+        notifier({ titre: "Service arrêté", detail: svc.nom, type: "error", to: "/services" });
+      }
+    }, 550);
   };
+
+  if (loading) {
+    return (
+      <AppShell>
+        <PageHeader titre="Services" description="Démarrez, arrêtez et supervisez l'état des services de la plateforme." />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="skeleton-brand h-64 w-full rounded-2xl" />
+          ))}
+        </div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell>
@@ -55,20 +87,30 @@ function ServicesPage() {
         titre="Services"
         description="Démarrez, arrêtez et supervisez l'état des services de la plateforme."
         actions={
-          <Button variant="outline" onClick={() => toast.info("Actualisation de l'état des services…")}>
+          <Button
+            variant="outline"
+            loading={refreshing}
+            onClick={() => {
+              setRefreshing(true);
+              window.setTimeout(() => {
+                setRefreshing(false);
+                toast.success(`${state.services.length} services actualisés.`);
+              }, 600);
+            }}
+          >
             <RefreshCw className="h-4 w-4" /> Actualiser
           </Button>
         }
       />
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {services.map((svc, i) => (
+        {state.services.map((svc, i) => (
           <article
             key={svc.id}
-            className="hover-lift group relative overflow-hidden rounded-2xl border border-border bg-card/85 p-5 shadow-soft backdrop-blur-sm animate-rise"
+            className="glow-card group relative overflow-hidden rounded-2xl border border-border bg-card/85 p-5 shadow-soft backdrop-blur-sm animate-rise"
             style={{ animationDelay: `${i * 60}ms` }}
           >
-            <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-primary/10 blur-2xl transition-all group-hover:bg-primary/20" />
+            <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-primary/10 blur-2xl transition-all duration-500 group-hover:bg-primary/25" />
             <div className="flex items-start gap-3">
               <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
                 <Cpu className="h-5 w-5" />
@@ -102,7 +144,12 @@ function ServicesPage() {
 
             <div className="mt-5 flex items-center justify-between border-t border-border pt-4">
               <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Switch checked={svc.statut !== "arrete"} onCheckedChange={() => toggle(svc)} aria-label={`Activer ${svc.nom}`} />
+                <Switch
+                  checked={svc.statut !== "arrete"}
+                  disabled={busy === svc.id}
+                  onCheckedChange={() => toggle(svc)}
+                  aria-label={`Activer ${svc.nom}`}
+                />
                 Service actif
               </label>
               <Button
