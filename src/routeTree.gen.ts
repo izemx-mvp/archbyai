@@ -13,10 +13,12 @@ import { Route as UtilisateursRouteImport } from './routes/utilisateurs'
 import { Route as SimulationsRouteImport } from './routes/simulations'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ParametresRouteImport } from './routes/parametres'
+import { Route as NouvelleSimulationRouteImport } from './routes/nouvelle-simulation'
 import { Route as HistoriqueRouteImport } from './routes/historique'
 import { Route as ConnexionRouteImport } from './routes/connexion'
 import { Route as AbonnementsRouteImport } from './routes/abonnements'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlanReferenceRouteImport } from './routes/plan.$reference'
 
 const UtilisateursRoute = UtilisateursRouteImport.update({
   id: '/utilisateurs',
@@ -36,6 +38,11 @@ const ServicesRoute = ServicesRouteImport.update({
 const ParametresRoute = ParametresRouteImport.update({
   id: '/parametres',
   path: '/parametres',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NouvelleSimulationRoute = NouvelleSimulationRouteImport.update({
+  id: '/nouvelle-simulation',
+  path: '/nouvelle-simulation',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoriqueRoute = HistoriqueRouteImport.update({
@@ -58,26 +65,35 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlanReferenceRoute = PlanReferenceRouteImport.update({
+  id: '/plan/$reference',
+  path: '/plan/$reference',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/abonnements': typeof AbonnementsRoute
   '/connexion': typeof ConnexionRoute
   '/historique': typeof HistoriqueRoute
+  '/nouvelle-simulation': typeof NouvelleSimulationRoute
   '/parametres': typeof ParametresRoute
   '/services': typeof ServicesRoute
   '/simulations': typeof SimulationsRoute
   '/utilisateurs': typeof UtilisateursRoute
+  '/plan/$reference': typeof PlanReferenceRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/abonnements': typeof AbonnementsRoute
   '/connexion': typeof ConnexionRoute
   '/historique': typeof HistoriqueRoute
+  '/nouvelle-simulation': typeof NouvelleSimulationRoute
   '/parametres': typeof ParametresRoute
   '/services': typeof ServicesRoute
   '/simulations': typeof SimulationsRoute
   '/utilisateurs': typeof UtilisateursRoute
+  '/plan/$reference': typeof PlanReferenceRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -85,10 +101,12 @@ export interface FileRoutesById {
   '/abonnements': typeof AbonnementsRoute
   '/connexion': typeof ConnexionRoute
   '/historique': typeof HistoriqueRoute
+  '/nouvelle-simulation': typeof NouvelleSimulationRoute
   '/parametres': typeof ParametresRoute
   '/services': typeof ServicesRoute
   '/simulations': typeof SimulationsRoute
   '/utilisateurs': typeof UtilisateursRoute
+  '/plan/$reference': typeof PlanReferenceRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,30 +115,36 @@ export interface FileRouteTypes {
     | '/abonnements'
     | '/connexion'
     | '/historique'
+    | '/nouvelle-simulation'
     | '/parametres'
     | '/services'
     | '/simulations'
     | '/utilisateurs'
+    | '/plan/$reference'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/abonnements'
     | '/connexion'
     | '/historique'
+    | '/nouvelle-simulation'
     | '/parametres'
     | '/services'
     | '/simulations'
     | '/utilisateurs'
+    | '/plan/$reference'
   id:
     | '__root__'
     | '/'
     | '/abonnements'
     | '/connexion'
     | '/historique'
+    | '/nouvelle-simulation'
     | '/parametres'
     | '/services'
     | '/simulations'
     | '/utilisateurs'
+    | '/plan/$reference'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -128,10 +152,12 @@ export interface RootRouteChildren {
   AbonnementsRoute: typeof AbonnementsRoute
   ConnexionRoute: typeof ConnexionRoute
   HistoriqueRoute: typeof HistoriqueRoute
+  NouvelleSimulationRoute: typeof NouvelleSimulationRoute
   ParametresRoute: typeof ParametresRoute
   ServicesRoute: typeof ServicesRoute
   SimulationsRoute: typeof SimulationsRoute
   UtilisateursRoute: typeof UtilisateursRoute
+  PlanReferenceRoute: typeof PlanReferenceRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -164,6 +190,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ParametresRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/nouvelle-simulation': {
+      id: '/nouvelle-simulation'
+      path: '/nouvelle-simulation'
+      fullPath: '/nouvelle-simulation'
+      preLoaderRoute: typeof NouvelleSimulationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/historique': {
       id: '/historique'
       path: '/historique'
@@ -192,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/plan/$reference': {
+      id: '/plan/$reference'
+      path: '/plan/$reference'
+      fullPath: '/plan/$reference'
+      preLoaderRoute: typeof PlanReferenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -200,11 +240,23 @@ const rootRouteChildren: RootRouteChildren = {
   AbonnementsRoute: AbonnementsRoute,
   ConnexionRoute: ConnexionRoute,
   HistoriqueRoute: HistoriqueRoute,
+  NouvelleSimulationRoute: NouvelleSimulationRoute,
   ParametresRoute: ParametresRoute,
   ServicesRoute: ServicesRoute,
   SimulationsRoute: SimulationsRoute,
   UtilisateursRoute: UtilisateursRoute,
+  PlanReferenceRoute: PlanReferenceRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

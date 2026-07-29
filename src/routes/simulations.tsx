@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import { Box, CheckCircle2, Eye, Plus, Share2, Trash2, XCircle } from "lucide-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Box, CheckCircle2, Eye, LayoutGrid, Plus, Share2, Trash2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/app-shell";
@@ -52,6 +52,7 @@ const statutMap: Record<Simulation["statut"], { label: string; tone: Tone }> = {
 };
 
 function SimulationsPage() {
+  const navigate = useNavigate();
   const { state, ready, majSimulation, supprimerSimulation, journaliser, notifier } = useData();
   const [loading, setLoading] = useState(true);
   const [detail, setDetail] = useState<Simulation | null>(null);
@@ -98,6 +99,22 @@ function SimulationsPage() {
       className: "text-right",
       cell: (r) => (
         <div className="flex justify-end gap-1">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label="Ouvrir le plan 2D"
+            onClick={() => navigate({ to: "/plan/$reference", params: { reference: r.reference } })}
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label="Ouvrir la vue 3D"
+            onClick={() => navigate({ to: "/plan/$reference", params: { reference: r.reference } })}
+          >
+            <Box className="h-4 w-4" />
+          </Button>
           <Button variant="ghost" size="icon-sm" aria-label="Voir le détail de la simulation" onClick={() => setDetail(r)}>
             <Eye className="h-4 w-4" />
           </Button>
@@ -124,25 +141,7 @@ function SimulationsPage() {
         titre="Simulations"
         description="Plans d'architecture générés par l'IA, conformes aux normes et standards marocains."
         actions={
-          <Button
-            variant="hero"
-            onClick={() => {
-              journaliser({
-                api: "Génération plan 2D",
-                action: "POST /v1/simulations",
-                utilisateur: "m.toufella",
-                code: 202,
-                duree: 512,
-              });
-              notifier({
-                titre: "Simulation lancée",
-                detail: "La génération du plan est en file d'attente.",
-                type: "info",
-                to: "/simulations",
-              });
-              toast.success("Nouvelle simulation initialisée — suivez son avancement dans l'historique.");
-            }}
-          >
+          <Button variant="hero" onClick={() => navigate({ to: "/nouvelle-simulation" })}>
             <Plus className="h-4 w-4" /> Nouvelle simulation
           </Button>
         }
@@ -245,6 +244,12 @@ function SimulationsPage() {
                     }}
                   >
                     <XCircle className="h-4 w-4" /> Rejeter
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate({ to: "/plan/$reference", params: { reference: detail.reference } })}
+                  >
+                    <Box className="h-4 w-4" /> Ouvrir les vues 2D / 3D
                   </Button>
                   <Button variant="ghost" onClick={() => partager(detail)}>
                     <Share2 className="h-4 w-4" /> Partager

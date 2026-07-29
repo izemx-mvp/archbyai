@@ -17,6 +17,7 @@ import {
   Sun,
   Users,
   UserCog,
+  Sparkles,
 } from "lucide-react";
 
 import { AuroraBackground } from "@/components/aurora-background";
@@ -48,6 +49,7 @@ const navigation = [
   { to: "/services", label: "Services", icon: Cpu },
   { to: "/historique", label: "Historique", icon: History },
   { to: "/simulations", label: "Simulations", icon: Building2 },
+  { to: "/nouvelle-simulation", label: "Nouvelle simulation", icon: Sparkles },
   { to: "/utilisateurs", label: "Utilisateurs", icon: Users },
   { to: "/parametres", label: "Paramètres", icon: Settings },
 ] as const;
@@ -122,7 +124,7 @@ function SidebarInner({ collapsed, onNavigate }: { collapsed: boolean; onNavigat
     <div className="flex h-full flex-col">
       <div className={cn("flex h-16 items-center", collapsed ? "justify-center px-0" : "px-4")}>
         <Link to="/" aria-label="ArchbyAI" onClick={onNavigate} className="rounded-xl">
-          {collapsed ? <BrandMark /> : <BrandLogo />}
+          {collapsed ? <BrandMark /> : <BrandLogo className="h-11" />}
         </Link>
       </div>
 
