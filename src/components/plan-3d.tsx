@@ -205,11 +205,11 @@ export function Plan3D({
         <div
           className="absolute rounded-sm"
           style={{
-            width: w,
-            height: d,
-            left: -w / 2,
-            top: -d / 2,
-            transform: `translateZ(${etages * h + h}px)`,
+            width: w + 12,
+            height: d + 12,
+            left: -(w + 12) / 2,
+            top: -(d + 12) / 2,
+            transform: `translateZ(${etages * h}px)`,
             background: `linear-gradient(135deg, ${peinture}, rgba(0,0,0,.5))`,
             boxShadow: "0 10px 30px rgba(0,0,0,.3)",
           }}
