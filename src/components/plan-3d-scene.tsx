@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, Environment, Grid, Html, OrbitControls, Sky } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
@@ -170,8 +170,7 @@ function Facade({
   teinte: string;
 }) {
   const pas = longueur / (baies + 1);
-  const elements: JSX.Element[] = [];
-  const mat = <meshStandardMaterial color={couleur} roughness={0.9} />;
+  const elements: ReactElement[] = [];
 
   // trumeaux
   const bords: number[] = [];
@@ -210,7 +209,7 @@ function Facade({
     );
   });
 
-  return <group>{elements}{mat && null}</group>;
+  return <group>{elements}</group>;
 }
 
 function Bloc({
