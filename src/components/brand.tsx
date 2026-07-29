@@ -13,8 +13,8 @@ export function BrandLogo({ className }: { className?: string }) {
       <img
         src={logo}
         alt="ArchbyAI"
-        width={1536}
-        height={512}
+        width={776}
+        height={215}
         decoding="async"
         className="brand-logo-img h-full w-auto max-w-full select-none object-contain object-left"
       />
