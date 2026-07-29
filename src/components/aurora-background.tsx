@@ -9,7 +9,7 @@ const opacity: Record<Intensity, string> = {
   vivid: "opacity-100",
 };
 
-const canvasAlpha: Record<Intensity, number> = { subtle: 0.35, normal: 0.6, vivid: 0.9 };
+const canvasAlpha: Record<Intensity, number> = { subtle: 0.55, normal: 0.85, vivid: 1 };
 
 type Node = { x: number; y: number; vx: number; vy: number; r: number };
 
@@ -180,7 +180,7 @@ export function AuroraBackground({
       />
 
       {/* vignette douce pour la lisibilité */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,transparent_35%,var(--color-background)_100%)] opacity-70" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,transparent_45%,var(--color-background)_100%)] opacity-50" />
     </div>
   );
 }
