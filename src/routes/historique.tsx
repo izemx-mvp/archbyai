@@ -8,7 +8,8 @@ import { DataTable, type Column } from "@/components/data-table";
 import { PageHeader } from "@/components/page-parts";
 import { StatusPill } from "@/components/status-pill";
 import { Button } from "@/components/ui/button";
-import { historique, type HistoriqueEntry } from "@/lib/mock-data";
+import { useData } from "@/lib/store";
+import type { HistoriqueEntry } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/historique")({
   head: () => ({
@@ -26,11 +27,28 @@ export const Route = createFileRoute("/historique")({
 });
 
 function HistoriquePage() {
+  const { state, ready } = useData();
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const id = window.setTimeout(() => setLoading(false), 600);
+    if (!ready) return;
+    const id = window.setTimeout(() => setLoading(false), 450);
     return () => window.clearTimeout(id);
-  }, []);
+  }, [ready]);
+
+  const exporter = () => {
+    const entetes = ["date", "api", "action", "utilisateur", "duree", "code"];
+    const csv = [
+      entetes.join(";"),
+      ...state.historique.map((h) => entetes.map((k) => String(h[k as keyof HistoriqueEntry])).join(";")),
+    ].join("\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "historique-archbyai.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`${state.historique.length} appels exportés au format CSV.`);
+  };
 
   const columns: Column<HistoriqueEntry>[] = [
     { key: "date", header: "Date", sortable: true, value: (r) => r.date, cell: (r) => <span className="whitespace-nowrap font-medium">{r.date}</span> },
@@ -61,14 +79,14 @@ function HistoriquePage() {
         titre="Historique des appels"
         description="Supervisez l'historique, l'état et le statut des API de la plateforme."
         actions={
-          <Button variant="outline" onClick={() => toast.success("Journal exporté au format CSV.")}>
+          <Button variant="outline" onClick={exporter}>
             <Download className="h-4 w-4" /> Exporter le journal
           </Button>
         }
       />
 
       <DataTable
-        rows={historique}
+        rows={state.historique}
         columns={columns}
         loading={loading}
         pageSize={6}

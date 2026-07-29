@@ -64,7 +64,7 @@ export function TableSkeleton({ rows = 6, cols = 5 }: { rows?: number; cols?: nu
       {Array.from({ length: rows }).map((_, r) => (
         <div key={r} className="grid gap-4" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0,1fr))` }}>
           {Array.from({ length: cols }).map((__, c) => (
-            <Skeleton key={c} className="h-5 w-full rounded-md" />
+            <Skeleton key={c} className="skeleton-brand h-5 w-full rounded-md" />
           ))}
         </div>
       ))}
