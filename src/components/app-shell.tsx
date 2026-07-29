@@ -1,18 +1,18 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import {
   Bell,
   Building2,
   CheckCheck,
-  ChevronLeft,
+  Command,
   Cpu,
   History,
   LayoutDashboard,
   LogOut,
   Menu,
   Moon,
-  PanelsTopLeft,
   Plug,
+  Search,
   Settings,
   Sun,
   Users,
@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 
 import { AuroraBackground } from "@/components/aurora-background";
+import { PointerFx } from "@/components/pointer-fx";
 import { BrandLogo, BrandMark } from "@/components/brand";
 import { SearchField } from "@/components/search-field";
 import { StatusPill } from "@/components/status-pill";
@@ -41,8 +42,6 @@ import { useTheme } from "@/components/theme-provider";
 import { useData } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
-const COLLAPSE_KEY = "archbyai-sidebar-collapsed";
-
 const navigation = [
   { to: "/", label: "Tableau de bord", icon: LayoutDashboard },
   { to: "/abonnements", label: "Abonnements API", icon: Plug },
@@ -59,120 +58,153 @@ export function useCurrentNav() {
   return navigation.find((n) => n.to === pathname) ?? navigation[0];
 }
 
-function NavList({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: () => void }) {
+/** Barre de navigation horizontale « command deck » avec indicateur glissant. */
+function CommandDeck() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const itemRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
+  const [indicator, setIndicator] = useState<{ left: number; width: number; ready: boolean }>({
+    left: 0,
+    width: 0,
+    ready: false,
+  });
+
+  useLayoutEffect(() => {
+    const place = () => {
+      const el = itemRefs.current[pathname];
+      const list = listRef.current;
+      if (!el || !list) {
+        setIndicator((i) => ({ ...i, ready: false }));
+        return;
+      }
+      setIndicator({ left: el.offsetLeft, width: el.offsetWidth, ready: true });
+      el.scrollIntoView({ block: "nearest", inline: "nearest" });
+    };
+    place();
+    window.addEventListener("resize", place);
+    const t = window.setTimeout(place, 220);
+    return () => {
+      window.removeEventListener("resize", place);
+      window.clearTimeout(t);
+    };
+  }, [pathname]);
 
   return (
-    <nav className={cn("flex flex-col gap-1", collapsed ? "px-3" : "px-3")}>
+    <div
+      ref={listRef}
+      className="hud-glass relative flex items-center gap-0.5 overflow-x-auto rounded-full p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    >
+      <span
+        aria-hidden
+        className="neon pointer-events-none absolute bottom-1 top-1 rounded-full bg-primary transition-[left,width,opacity] duration-500 ease-[cubic-bezier(0.34,1.35,0.64,1)]"
+        style={{ left: indicator.left, width: indicator.width, opacity: indicator.ready ? 1 : 0 }}
+      />
       {navigation.map((item) => {
         const active = pathname === item.to;
-        const link = (
+        return (
           <Link
+            key={item.to}
             to={item.to}
-            onClick={onNavigate}
-            aria-label={item.label}
+            ref={(el) => {
+              itemRefs.current[item.to] = el;
+            }}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "group relative flex h-11 items-center rounded-xl text-sm font-medium",
-              "transition-[background-color,color,transform] duration-300 ease-[cubic-bezier(0.34,1.4,0.64,1)]",
-              collapsed ? "w-11 justify-center px-0" : "w-full gap-3 px-3",
-              active
-                ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-soft"
-                : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+              "sheen group relative z-10 flex h-10 shrink-0 items-center gap-2 rounded-full px-3.5 text-[13px] font-semibold",
+              "transition-[color,transform] duration-300 ease-[cubic-bezier(0.34,1.4,0.64,1)] hover:-translate-y-0.5",
+              active ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground",
             )}
           >
-            <span
-              className={cn(
-                "absolute top-1/2 h-6 w-1 -translate-y-1/2 rounded-full bg-primary transition-all duration-300",
-                collapsed ? "-left-2" : "left-0",
-                active ? "opacity-100" : "scale-y-0 opacity-0",
-              )}
-            />
             <item.icon
               className={cn(
-                "h-[18px] w-[18px] shrink-0 transition-transform duration-300 group-hover:scale-110",
-                active && "text-primary",
+                "h-[17px] w-[17px] shrink-0 transition-transform duration-300 group-hover:scale-110",
+                active && "drop-shadow-[0_0_6px_rgba(255,255,255,0.55)]",
               )}
             />
-            <span
-              className={cn(
-                "min-w-0 truncate transition-opacity duration-200",
-                collapsed && "pointer-events-none hidden",
-              )}
-            >
-              {item.label}
-            </span>
+            <span className="hidden xl:inline">{item.label}</span>
           </Link>
         );
-
-        return collapsed ? (
-          <Tooltip key={item.to}>
-            <TooltipTrigger asChild>{link}</TooltipTrigger>
-            <TooltipContent side="right">{item.label}</TooltipContent>
-          </Tooltip>
-        ) : (
-          <div key={item.to}>{link}</div>
-        );
       })}
-    </nav>
+    </div>
   );
 }
 
-function SidebarInner({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: () => void }) {
-  const navigate = useNavigate();
+/** Menu plein écran (mobile / tablette) : grille de tuiles HUD. */
+function MobileNavGrid({ onNavigate }: { onNavigate: () => void }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <div className="flex h-full flex-col">
-      <div className={cn("flex h-16 items-center", collapsed ? "justify-center px-0" : "px-4")}>
-        <Link to="/" aria-label="ArchbyAI" onClick={onNavigate} className="rounded-xl">
-          {collapsed ? <BrandMark /> : <BrandLogo className="h-11" />}
-        </Link>
+      <div className="flex h-16 items-center px-4">
+        <BrandLogo className="h-11" />
       </div>
-
-      <div className="mt-2 flex-1 overflow-y-auto overflow-x-hidden pb-4">
-        {!collapsed && (
-          <p className="px-6 pb-2 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
-            Pilotage
-          </p>
-        )}
-        <NavList collapsed={collapsed} onNavigate={onNavigate} />
+      <div className="grid flex-1 grid-cols-2 content-start gap-3 overflow-y-auto p-4">
+        {navigation.map((item, i) => {
+          const active = pathname === item.to;
+          return (
+            <Link
+              key={item.to}
+              to={item.to}
+              onClick={onNavigate}
+              style={{ animationDelay: `${i * 35}ms` }}
+              className={cn(
+                "hud-frame animate-pop flex aspect-square flex-col justify-end gap-2 rounded-2xl border p-4 text-left",
+                "transition-all duration-300 hover:-translate-y-1",
+                active ? "neon border-primary/50 bg-primary/10" : "border-border bg-card/70 backdrop-blur-xl",
+              )}
+            >
+              <item.icon className={cn("h-6 w-6", active ? "text-primary" : "text-muted-foreground")} />
+              <span className="text-sm font-semibold leading-tight">{item.label}</span>
+            </Link>
+          );
+        })}
       </div>
+    </div>
+  );
+}
 
-      <div className={cn("border-t border-sidebar-border p-3", collapsed && "px-3")}>
-        {collapsed ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                aria-label="Mon profil — Mohamed Toufella"
-                onClick={() => {
-                  onNavigate?.();
-                  navigate({ to: "/parametres" });
-                }}
-                className="mx-auto grid h-11 w-11 place-items-center rounded-xl transition-colors hover:bg-sidebar-accent/60"
-              >
-                <Avatar className="h-8 w-8 ring-2 ring-primary/25">
-                  <AvatarFallback className="bg-primary/10 text-[11px] font-bold text-primary">MT</AvatarFallback>
-                </Avatar>
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="right">Mohamed Toufella — Administrateur</TooltipContent>
-          </Tooltip>
-        ) : (
-          <button
-            onClick={() => {
-              onNavigate?.();
-              navigate({ to: "/parametres" });
-            }}
-            className="flex w-full items-center gap-3 rounded-xl p-2 text-left transition-colors hover:bg-sidebar-accent/60"
-          >
-            <Avatar className="h-9 w-9 shrink-0 ring-2 ring-primary/25">
-              <AvatarFallback className="bg-primary/10 text-xs font-bold text-primary">MT</AvatarFallback>
-            </Avatar>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold">Mohamed Toufella</p>
-              <p className="truncate text-xs text-muted-foreground">Administrateur</p>
-            </div>
-          </button>
-        )}
+/** Dock flottant façon HUD : accès instantané aux actions clés. */
+function QuickDock() {
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { toggleTheme } = useTheme();
+
+  const actions = [
+    { label: "Tableau de bord", icon: LayoutDashboard, run: () => navigate({ to: "/" }), to: "/" },
+    { label: "Simulations", icon: Building2, run: () => navigate({ to: "/simulations" }), to: "/simulations" },
+    {
+      label: "Nouvelle simulation",
+      icon: Sparkles,
+      run: () => navigate({ to: "/nouvelle-simulation" }),
+      to: "/nouvelle-simulation",
+    },
+    {
+      label: "Recherche",
+      icon: Search,
+      run: () => document.getElementById("recherche-globale")?.querySelector("input")?.focus(),
+    },
+    { label: "Thème", icon: Moon, run: toggleTheme },
+  ] as const;
+
+  return (
+    <div className="pointer-events-none fixed inset-x-0 bottom-4 z-40 flex justify-center px-4 lg:hidden">
+      <div className="hud-glass pointer-events-auto flex items-center gap-1 rounded-full p-1.5">
+        {actions.map((a) => {
+          const active = "to" in a && a.to === pathname;
+          return (
+            <button
+              key={a.label}
+              onClick={a.run}
+              aria-label={a.label}
+              className={cn(
+                "sheen grid h-11 w-11 place-items-center rounded-full transition-all duration-300",
+                "hover:-translate-y-1.5 hover:scale-110 active:scale-95",
+                active ? "neon bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <a.icon className="h-[18px] w-[18px]" />
+            </button>
+          );
+        })}
       </div>
     </div>
   );
