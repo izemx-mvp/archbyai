@@ -185,6 +185,6 @@ export const OPTIONS_PEINTURE = [
   { nom: "Terre de Marrakech", valeur: "#c4714a" },
   { nom: "Bleu Majorelle", valeur: "#3b5bdb" },
   { nom: "Sable", valeur: "#d8c39a" },
-  { nom: "Vert olive", valeur: "#6f7d४f".replace("४", "4") },
+  { nom: "Vert olive", valeur: "#6f7d4f" },
   { nom: "Gris ardoise", valeur: "#4b5563" },
 ];
