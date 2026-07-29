@@ -7,6 +7,7 @@ import { AppShell } from "@/components/app-shell";
 import { DataTable, type Column } from "@/components/data-table";
 import { PageHeader } from "@/components/page-parts";
 import { StatusPill, type Tone } from "@/components/status-pill";
+import { PlanMini } from "@/components/plan-mini";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -193,19 +194,20 @@ function SimulationsPage() {
               </SheetHeader>
 
               <div className="space-y-6 px-4 pb-6">
-                <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-brand-soft p-6">
-                  <div className="grid grid-cols-3 gap-2">
-                    {Array.from({ length: Math.min(9, detail.chambres + 4) }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="h-16 rounded-lg border border-primary/30 bg-card/60 animate-rise"
-                        style={{ animationDelay: `${i * 40}ms` }}
-                      />
-                    ))}
+                <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-brand-soft p-4">
+                  <PlanMini simulation={detail} />
+                  <div className="mt-3 flex items-center justify-between gap-3">
+                    <p className="text-xs text-muted-foreground">
+                      Aperçu schématique du plan — {detail.superficie} m² sur {detail.etages} étage(s).
+                    </p>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => navigate({ to: "/plan/$reference", params: { reference: detail.reference } })}
+                    >
+                      Vue détaillée
+                    </Button>
                   </div>
-                  <p className="mt-4 text-xs text-muted-foreground">
-                    Aperçu schématique du plan — {detail.superficie} m² sur {detail.etages} étage(s).
-                  </p>
                 </div>
 
                 <dl className="grid grid-cols-2 gap-3 text-sm">
