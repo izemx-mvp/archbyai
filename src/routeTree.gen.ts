@@ -17,6 +17,7 @@ import { Route as HistoriqueRouteImport } from './routes/historique'
 import { Route as ConnexionRouteImport } from './routes/connexion'
 import { Route as AbonnementsRouteImport } from './routes/abonnements'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlanReferenceRouteImport } from './routes/plan.$reference'
 
 const UtilisateursRoute = UtilisateursRouteImport.update({
   id: '/utilisateurs',
@@ -58,6 +59,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlanReferenceRoute = PlanReferenceRouteImport.update({
+  id: '/plan/$reference',
+  path: '/plan/$reference',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -68,6 +74,7 @@ export interface FileRoutesByFullPath {
   '/services': typeof ServicesRoute
   '/simulations': typeof SimulationsRoute
   '/utilisateurs': typeof UtilisateursRoute
+  '/plan/$reference': typeof PlanReferenceRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/services': typeof ServicesRoute
   '/simulations': typeof SimulationsRoute
   '/utilisateurs': typeof UtilisateursRoute
+  '/plan/$reference': typeof PlanReferenceRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +97,7 @@ export interface FileRoutesById {
   '/services': typeof ServicesRoute
   '/simulations': typeof SimulationsRoute
   '/utilisateurs': typeof UtilisateursRoute
+  '/plan/$reference': typeof PlanReferenceRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,6 +110,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/simulations'
     | '/utilisateurs'
+    | '/plan/$reference'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,6 +121,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/simulations'
     | '/utilisateurs'
+    | '/plan/$reference'
   id:
     | '__root__'
     | '/'
@@ -121,6 +132,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/simulations'
     | '/utilisateurs'
+    | '/plan/$reference'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -132,6 +144,7 @@ export interface RootRouteChildren {
   ServicesRoute: typeof ServicesRoute
   SimulationsRoute: typeof SimulationsRoute
   UtilisateursRoute: typeof UtilisateursRoute
+  PlanReferenceRoute: typeof PlanReferenceRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -192,6 +205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/plan/$reference': {
+      id: '/plan/$reference'
+      path: '/plan/$reference'
+      fullPath: '/plan/$reference'
+      preLoaderRoute: typeof PlanReferenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -204,6 +224,7 @@ const rootRouteChildren: RootRouteChildren = {
   ServicesRoute: ServicesRoute,
   SimulationsRoute: SimulationsRoute,
   UtilisateursRoute: UtilisateursRoute,
+  PlanReferenceRoute: PlanReferenceRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
