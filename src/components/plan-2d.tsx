@@ -11,38 +11,63 @@ const GRID_W = 12;
 const GRID_H = 8;
 
 export function genererPieces(sim: Simulation, etage: number): Piece[] {
-  const chambres = etage === 0 ? Math.max(0, Math.ceil((sim.chambres ?? 0) / sim.etages)) : Math.floor((sim.chambres ?? 0) / sim.etages);
-  const cuisines = etage === 0 ? Math.max(1, sim.cuisines ?? 1) : Math.max(0, (sim.cuisines ?? 1) - 1);
-  const sanitaires = Math.max(1, Math.round((sim.sanitaires ?? 2) / sim.etages));
-  const commercial = sim.type === "Commercial";
+  const parEtage = (n: number) => Math.max(0, Math.round(n / sim.etages));
+  const chambres = sim.type === "Commercial" ? 0 : Math.max(etage === 0 ? 1 : 0, parEtage(sim.chambres ?? 0));
+  const cuisines = sim.type === "Commercial" ? 0 : Math.max(etage === 0 ? 1 : 0, parEtage(sim.cuisines ?? 1));
+  const sanitaires = Math.max(1, parEtage(sim.sanitaires ?? 2));
+
+  /** Chaque pièce reçoit un poids : la trame est ensuite remplie intégralement. */
+  const specs: { nom: string; poids: number; ton: number }[] = [];
+  if (sim.type === "Commercial") {
+    specs.push({ nom: etage === 0 ? "Hall commercial" : "Plateau bureaux", poids: 3.2, ton: 1 });
+    specs.push({ nom: "Réserve", poids: 1.6, ton: 2 });
+    specs.push({ nom: "Bureau gestion", poids: 1.4, ton: 4 });
+  } else {
+    specs.push({ nom: etage === 0 ? "Séjour" : "Salon d'étage", poids: 2.6, ton: 1 });
+    for (let i = 0; i < cuisines; i += 1) specs.push({ nom: cuisines > 1 ? `Cuisine ${i + 1}` : "Cuisine", poids: 1.4, ton: 2 });
+    for (let i = 0; i < chambres; i += 1) specs.push({ nom: `Chambre ${i + 1}`, poids: 1.5, ton: 4 });
+  }
+  for (let i = 0; i < sanitaires; i += 1) specs.push({ nom: sanitaires > 1 ? `Sanitaire ${i + 1}` : "Sanitaire", poids: 0.9, ton: 5 });
+  if (sim.type !== "Villa" && (sim.appartementsParEtage ?? 0) > 1)
+    specs.push({ nom: `Palier · ${sim.appartementsParEtage} appts`, poids: 1, ton: 0 });
+  if (sim.sousSol && etage === 0) specs.push({ nom: "Accès sous-sol", poids: 0.9, ton: 6 });
+  if (sim.type === "Villa" && etage === 0) {
+    specs.push({ nom: "Jardin", poids: 1.8, ton: 3 });
+    if (sim.piscine) specs.push({ nom: "Piscine", poids: 1.3, ton: 3 });
+  } else if (sim.type !== "Commercial") {
+    specs.push({ nom: etage === 0 ? "Terrasse" : "Balcon", poids: 1.1, ton: 3 });
+  }
+  specs.push({ nom: "Circulation", poids: 1.2, ton: 0 });
+
+  // Répartition en rangées de poids équilibré, puis remplissage exact de la trame.
+  const total = specs.reduce((a, s) => a + s.poids, 0);
+  const rangees = Math.max(1, Math.min(4, Math.round(Math.sqrt(specs.length))));
+  const cible = total / rangees;
+
+  const groupes: typeof specs[] = [[]];
+  let cumul = 0;
+  specs.forEach((sp) => {
+    const g = groupes[groupes.length - 1];
+    if (g.length && cumul + sp.poids / 2 > cible && groupes.length < rangees) {
+      groupes.push([sp]);
+      cumul = sp.poids;
+    } else {
+      g.push(sp);
+      cumul += sp.poids;
+    }
+  });
 
   const pieces: Piece[] = [];
-  let x = 0;
-  let y = 0;
-  const pousser = (nom: string, w: number, h: number, ton: number) => {
-    if (x + w > GRID_W) {
-      x = 0;
-      y += h;
-    }
-    if (y + h > GRID_H) return;
-    pieces.push({ nom, x, y, w, h, ton });
-    x += w;
-  };
-
-  if (commercial) {
-    pousser(etage === 0 ? "Hall commercial" : "Plateau bureaux", 7, 4, 1);
-    pousser("Réserve", 5, 4, 2);
-  } else {
-    pousser(etage === 0 ? "Séjour" : "Salon d'étage", 6, 4, 1);
-    pousser("Cuisine", cuisines > 0 ? 3 : 0, 4, 2);
-    pousser("Terrasse", 3, 4, 3);
-  }
-
-  for (let i = 0; i < chambres; i += 1) pousser(`Chambre ${i + 1}`, 3, 2, 4);
-  for (let i = 0; i < sanitaires; i += 1) pousser(`Sanitaire ${i + 1}`, 2, 2, 5);
-  if (sim.sousSol && etage === 0) pousser("Accès sous-sol", 2, 2, 6);
-  if (sim.type === "Villa" && etage === 0 && sim.piscine) pousser("Piscine", 4, 2, 3);
-  pousser("Circulation", GRID_W - (x % GRID_W || GRID_W) || 2, 2, 0);
+  const hauteurRangee = GRID_H / groupes.length;
+  groupes.forEach((groupe, r) => {
+    const poidsRangee = groupe.reduce((a, s) => a + s.poids, 0);
+    let x = 0;
+    groupe.forEach((sp, i) => {
+      const w = i === groupe.length - 1 ? GRID_W - x : (sp.poids / poidsRangee) * GRID_W;
+      pieces.push({ nom: sp.nom, x, y: r * hauteurRangee, w, h: hauteurRangee, ton: sp.ton });
+      x += w;
+    });
+  });
 
   return pieces;
 }
