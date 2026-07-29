@@ -412,3 +412,179 @@
     transition-duration: 0.08s !important;
   }
 }
+
+/* ============================================================
+   HUD / next-gen interface effects
+   ============================================================ */
+
+@keyframes sweep {
+  0% {
+    transform: translateX(-160%) skewX(-18deg);
+  }
+  100% {
+    transform: translateX(260%) skewX(-18deg);
+  }
+}
+
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes glow-breathe {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes scan-line {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(1200%);
+  }
+}
+
+/* Halo qui suit le curseur (Vercel / Linear like) */
+@utility spotlight {
+  position: relative;
+  isolation: isolate;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+    background: radial-gradient(
+      340px circle at var(--px, 50%) var(--py, 0%),
+      color-mix(in oklab, var(--primary) 16%, transparent),
+      transparent 62%
+    );
+  }
+  &:hover::before {
+    opacity: 1;
+  }
+  & > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* Balayage lumineux au survol (boutons, pills) */
+@utility sheen {
+  position: relative;
+  overflow: hidden;
+  &::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    bottom: -50%;
+    left: 0;
+    width: 42%;
+    pointer-events: none;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, white 45%, transparent),
+      transparent
+    );
+    opacity: 0;
+    transform: translateX(-160%) skewX(-18deg);
+  }
+  &:hover::after {
+    opacity: 0.55;
+    animation: sweep 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+/* Cadre HUD avec équerres lumineuses aux quatre coins */
+@utility hud-frame {
+  position: relative;
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+    border-color: color-mix(in oklab, var(--primary) 55%, transparent);
+    transition: border-color 0.3s ease;
+  }
+  &::before {
+    top: 8px;
+    left: 8px;
+    border-top: 2px solid;
+    border-left: 2px solid;
+    border-top-left-radius: 8px;
+  }
+  &::after {
+    bottom: 8px;
+    right: 8px;
+    border-bottom: 2px solid;
+    border-right: 2px solid;
+    border-bottom-right-radius: 8px;
+  }
+  &:hover::before,
+  &:hover::after {
+    border-color: color-mix(in oklab, var(--brand) 85%, transparent);
+  }
+}
+
+/* Verre HUD : fond translucide + saturation + liseré interne */
+@utility hud-glass {
+  background: color-mix(in oklab, var(--card) 72%, transparent);
+  backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 55%, transparent),
+    var(--shadow-elevated);
+  .dark & {
+    background: color-mix(in oklab, var(--card) 58%, transparent);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, white 8%, transparent),
+      var(--shadow-elevated);
+  }
+}
+
+/* Néon discret pour éléments actifs */
+@utility neon {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--primary) 45%, transparent),
+    0 8px 26px -10px color-mix(in oklab, var(--primary) 70%, transparent),
+    0 0 22px -6px color-mix(in oklab, var(--primary-glow) 60%, transparent);
+}
+
+@utility neon-brand {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--brand) 50%, transparent),
+    0 10px 30px -12px color-mix(in oklab, var(--brand) 75%, transparent);
+}
+
+/* Trame technique type calque CAO */
+@utility tech-grid {
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--primary) 8%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--primary) 8%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+@utility animate-float {
+  animation: float-y 6s ease-in-out infinite;
+}
+
+@utility animate-breathe {
+  animation: glow-breathe 3.4s ease-in-out infinite;
+}
