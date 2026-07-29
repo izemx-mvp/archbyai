@@ -89,10 +89,10 @@ function KpiCard({ kpi, ready, index }: { kpi: (typeof kpis)[number]; ready: boo
           <kpi.icon className="h-5 w-5" />
         </div>
       </div>
-      <p className="mt-3 text-3xl font-extrabold tracking-tight">
+      <div className="mt-3 flex items-baseline gap-0.5 text-3xl font-extrabold tracking-tight">
         {ready ? value.toLocaleString("fr-FR") : <Skeleton className="h-9 w-24" />}
         <span className="text-xl">{kpi.suffix}</span>
-      </p>
+      </div>
       <div className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-success">
         <TrendingUp className="h-3.5 w-3.5" /> {kpi.delta}
         <span className="font-normal text-muted-foreground">vs semaine précédente</span>
