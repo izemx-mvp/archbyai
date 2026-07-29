@@ -32,7 +32,7 @@ export function BrandMark({ className }: { className?: string }) {
         width={512}
         height={512}
         decoding="async"
-        className="brand-logo-img h-8 w-8 select-none object-contain"
+        className="brand-logo-img h-10 w-10 select-none object-contain"
       />
     </span>
   );
