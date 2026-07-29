@@ -81,6 +81,7 @@ type Ctx = {
   inviterUtilisateur: (input: Omit<Utilisateur, "id" | "derniereConnexion">) => Utilisateur;
   majUtilisateur: (id: string, patch: Partial<Utilisateur>) => void;
   supprimerUtilisateur: (id: string) => void;
+  creerSimulation: (input: Omit<Simulation, "id" | "reference" | "date">) => Simulation;
   majSimulation: (id: string, patch: Partial<Simulation>) => void;
   supprimerSimulation: (id: string) => void;
   journaliser: (entry: Omit<HistoriqueEntry, "id" | "date">) => void;
@@ -170,6 +171,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setState((s) => ({ ...s, utilisateurs: patchList(s.utilisateurs, id, patch) })),
       supprimerUtilisateur: (id) =>
         setState((s) => ({ ...s, utilisateurs: s.utilisateurs.filter((u) => u.id !== id) })),
+      creerSimulation: (input) => {
+        const prefixe =
+          input.type === "Villa" ? "VL" : input.type === "Commercial" ? "CM" : "R2";
+        const ville = input.ville.slice(0, 4).toUpperCase();
+        const cree: Simulation = {
+          ...input,
+          id: `SIM-${Math.floor(2300 + Math.random() * 700)}`,
+          reference: `${prefixe}-${ville}-${String(Math.floor(Math.random() * 9999)).padStart(4, "0")}`,
+          date: new Intl.DateTimeFormat("fr-FR").format(new Date()),
+        };
+        setState((s) => ({ ...s, simulations: [cree, ...s.simulations] }));
+        return cree;
+      },
       majSimulation: (id, patch) =>
         setState((s) => ({ ...s, simulations: patchList(s.simulations, id, patch) })),
       supprimerSimulation: (id) =>

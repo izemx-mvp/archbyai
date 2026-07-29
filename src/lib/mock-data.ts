@@ -53,6 +53,21 @@ export type Simulation = {
   statut: "generee" | "en_cours" | "validee" | "rejetee";
   auteur: string;
   date: string;
+  /** Critères détaillés issus du formulaire de simulation (cahier des charges §5.2). */
+  sanitaires?: number;
+  cuisines?: number;
+  facades?: number;
+  sousSol?: boolean;
+  appartementsParEtage?: number;
+  superficieJardin?: number;
+  piscine?: boolean;
+  planTopographique?: string;
+  /** Personnalisation de la vue 3D (cahier des charges §5.3). */
+  personnalisation?: {
+    peinture: string;
+    sol: "Carrelage" | "Parquet" | "Béton ciré" | "Zellige";
+    eclairage: "Chaud" | "Neutre" | "Froid";
+  };
 };
 
 export const apis: ApiSubscription[] = [
