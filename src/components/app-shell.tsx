@@ -288,7 +288,7 @@ function NotificationsMenu() {
 }
 
 /** Recherche globale : interroge réellement les données de la plateforme. */
-function GlobalSearch() {
+function GlobalSearch({ id }: { id?: string }) {
   const { state } = useData();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
@@ -311,7 +311,7 @@ function GlobalSearch() {
   }, [query, index]);
 
   return (
-    <div id="recherche-globale" className="relative w-full">
+    <div id={id} className="relative w-full">
       <SearchField
         value={query}
         onChange={(v) => {
@@ -437,7 +437,7 @@ export function AppShell({
               </div>
 
               <div className="ml-auto hidden w-full max-w-sm md:block">
-                <GlobalSearch />
+                <GlobalSearch id="recherche-globale" />
               </div>
 
               <div className="ml-auto flex shrink-0 items-center gap-1 md:ml-0">
