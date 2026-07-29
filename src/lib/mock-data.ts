@@ -78,6 +78,9 @@ export const apis: ApiSubscription[] = [
   { id: "API-1072", nom: "Partage sécurisé", client: "Résidences Anfa", plan: "Pro", statut: "suspendu", quota: 8000, consomme: 8000, latence: 158, renouvellement: "05/08/2026" },
   { id: "API-1080", nom: "Estimation coûts", client: "Sahara Build", plan: "Découverte", statut: "erreur", quota: 2000, consomme: 1870, latence: 921, renouvellement: "22/08/2026" },
   { id: "API-1091", nom: "Personnalisation matériaux", client: "Studio Medina", plan: "Pro", statut: "actif", quota: 12000, consomme: 3340, latence: 176, renouvellement: "14/10/2026" },
+  { id: "API-1098", nom: "Export DWG / IFC", client: "Cabinet Bennani", plan: "Entreprise", statut: "actif", quota: 15000, consomme: 6480, latence: 342, renouvellement: "18/12/2026" },
+  { id: "API-1104", nom: "Détection parcelle cadastrale", client: "Ville de Casablanca", plan: "Pro", statut: "maintenance", quota: 6000, consomme: 2210, latence: 268, renouvellement: "09/09/2026" },
+  { id: "API-1112", nom: "Analyse ensoleillement", client: "Résidences Anfa", plan: "Découverte", statut: "actif", quota: 3000, consomme: 940, latence: 205, renouvellement: "27/08/2026" },
 ];
 
 export const services: ServiceItem[] = [
@@ -97,6 +100,14 @@ export const historique: HistoriqueEntry[] = [
   { id: "LOG-9006", date: "29/07/2026 13:22", api: "Upload plan topographique", action: "PUT /v1/topo", utilisateur: "ville-casa", code: 201, duree: 2260 },
   { id: "LOG-9007", date: "29/07/2026 12:58", api: "Génération plan 2D", action: "POST /v1/plans", utilisateur: "h.idrissi", code: 429, duree: 61 },
   { id: "LOG-9008", date: "29/07/2026 12:31", api: "Personnalisation matériaux", action: "PATCH /v1/materials", utilisateur: "studio-medina", code: 200, duree: 305 },
+  { id: "LOG-9009", date: "29/07/2026 11:47", api: "Rendu 3D temps réel", action: "POST /v1/render", utilisateur: "i.cherkaoui", code: 200, duree: 2740 },
+  { id: "LOG-9010", date: "29/07/2026 11:05", api: "Génération plan 2D", action: "POST /v1/plans", utilisateur: "o.sbai", code: 201, duree: 1655 },
+  { id: "LOG-9011", date: "29/07/2026 10:38", api: "Conformité normes MA", action: "GET /v1/compliance/rules", utilisateur: "k.belhaj", code: 304, duree: 44 },
+  { id: "LOG-9012", date: "29/07/2026 09:52", api: "Upload plan topographique", action: "PUT /v1/topo", utilisateur: "s.elamrani", code: 500, duree: 3980 },
+  { id: "LOG-9013", date: "29/07/2026 09:14", api: "Partage sécurisé", action: "DELETE /v1/share/8821", utilisateur: "y.bennani", code: 204, duree: 71 },
+  { id: "LOG-9014", date: "28/07/2026 18:26", api: "Estimation coûts", action: "POST /v1/estimate", utilisateur: "api-sahara", code: 200, duree: 812 },
+  { id: "LOG-9015", date: "28/07/2026 17:03", api: "Personnalisation matériaux", action: "GET /v1/materials", utilisateur: "l.fassi", code: 401, duree: 29 },
+  { id: "LOG-9016", date: "28/07/2026 16:12", api: "Rendu 3D temps réel", action: "POST /v1/render/batch", utilisateur: "atlas-immo", code: 202, duree: 5240 },
 ];
 
 export const utilisateurs: Utilisateur[] = [
@@ -106,15 +117,26 @@ export const utilisateurs: Utilisateur[] = [
   { id: "USR-04", nom: "Youssef Bennani", email: "y.bennani@cabinet-bennani.ma", role: "Architecte", statut: "actif", derniereConnexion: "28/07/2026 17:45" },
   { id: "USR-05", nom: "Nadia Tazi", email: "n.tazi@residences-anfa.ma", role: "Utilisateur", statut: "invite", derniereConnexion: "—" },
   { id: "USR-06", nom: "Hamza Idrissi", email: "h.idrissi@sahara-build.ma", role: "Utilisateur", statut: "desactive", derniereConnexion: "12/07/2026 08:30" },
+  { id: "USR-07", nom: "Imane Cherkaoui", email: "i.cherkaoui@ville-casablanca.ma", role: "Architecte", statut: "actif", derniereConnexion: "29/07/2026 08:05" },
+  { id: "USR-08", nom: "Karim Belhaj", email: "k.belhaj@studio-medina.ma", role: "Utilisateur", statut: "actif", derniereConnexion: "28/07/2026 19:22" },
+  { id: "USR-09", nom: "Fatima Zahra Ouali", email: "fz.ouali@atlas-immo.ma", role: "Utilisateur", statut: "invite", derniereConnexion: "—" },
+  { id: "USR-10", nom: "Omar Sbai", email: "o.sbai@sahara-build.ma", role: "Architecte", statut: "actif", derniereConnexion: "27/07/2026 15:47" },
+  { id: "USR-11", nom: "Leila Fassi", email: "l.fassi@residences-anfa.ma", role: "Utilisateur", statut: "desactive", derniereConnexion: "02/07/2026 10:11" },
 ];
 
 export const simulations: Simulation[] = [
-  { id: "SIM-2201", reference: "R2-CASA-0041", type: "Non commercial", ville: "Casablanca", superficie: 320, etages: 3, chambres: 9, statut: "validee", auteur: "Salma El Amrani", date: "29/07/2026" },
-  { id: "SIM-2202", reference: "VL-MARR-0088", type: "Villa", ville: "Marrakech", superficie: 640, etages: 2, chambres: 5, statut: "generee", auteur: "Youssef Bennani", date: "28/07/2026" },
-  { id: "SIM-2203", reference: "CM-RABA-0012", type: "Commercial", ville: "Rabat", superficie: 1250, etages: 5, chambres: 0, statut: "en_cours", auteur: "Nadia Tazi", date: "28/07/2026" },
-  { id: "SIM-2204", reference: "R2-TANG-0107", type: "Non commercial", ville: "Tanger", superficie: 410, etages: 4, chambres: 12, statut: "generee", auteur: "Hamza Idrissi", date: "27/07/2026" },
-  { id: "SIM-2205", reference: "VL-AGAD-0033", type: "Villa", ville: "Agadir", superficie: 780, etages: 1, chambres: 4, statut: "rejetee", auteur: "Salma El Amrani", date: "26/07/2026" },
-  { id: "SIM-2206", reference: "CM-CASA-0075", type: "Commercial", ville: "Casablanca", superficie: 2100, etages: 7, chambres: 0, statut: "validee", auteur: "Youssef Bennani", date: "25/07/2026" },
+  { id: "SIM-2201", reference: "R2-CASA-0041", type: "Non commercial", ville: "Casablanca", superficie: 320, etages: 3, chambres: 9, statut: "validee", auteur: "Salma El Amrani", date: "29/07/2026", sanitaires: 6, cuisines: 3, facades: 2, sousSol: true, appartementsParEtage: 2, personnalisation: { peinture: "#f2ede4", sol: "Carrelage", eclairage: "Neutre" } },
+  { id: "SIM-2202", reference: "VL-MARR-0088", type: "Villa", ville: "Marrakech", superficie: 640, etages: 2, chambres: 5, statut: "generee", auteur: "Youssef Bennani", date: "28/07/2026", sanitaires: 4, cuisines: 2, facades: 4, sousSol: true, superficieJardin: 280, piscine: true, planTopographique: "topo-marrakech-nord.pdf", personnalisation: { peinture: "#c4714a", sol: "Zellige", eclairage: "Chaud" } },
+  { id: "SIM-2203", reference: "CM-RABA-0012", type: "Commercial", ville: "Rabat", superficie: 1250, etages: 5, chambres: 0, statut: "en_cours", auteur: "Nadia Tazi", date: "28/07/2026", sanitaires: 10, facades: 3, sousSol: true, personnalisation: { peinture: "#4b5563", sol: "Béton ciré", eclairage: "Froid" } },
+  { id: "SIM-2204", reference: "R2-TANG-0107", type: "Non commercial", ville: "Tanger", superficie: 410, etages: 4, chambres: 12, statut: "generee", auteur: "Hamza Idrissi", date: "27/07/2026", sanitaires: 8, cuisines: 4, facades: 2, appartementsParEtage: 3, personnalisation: { peinture: "#d8c39a", sol: "Parquet", eclairage: "Chaud" } },
+  { id: "SIM-2205", reference: "VL-AGAD-0033", type: "Villa", ville: "Agadir", superficie: 780, etages: 1, chambres: 4, statut: "rejetee", auteur: "Salma El Amrani", date: "26/07/2026", sanitaires: 3, cuisines: 1, facades: 5, superficieJardin: 420, piscine: true, planTopographique: "topo-agadir-plage.dwg", personnalisation: { peinture: "#f2ede4", sol: "Carrelage", eclairage: "Chaud" } },
+  { id: "SIM-2206", reference: "CM-CASA-0075", type: "Commercial", ville: "Casablanca", superficie: 2100, etages: 7, chambres: 0, statut: "validee", auteur: "Youssef Bennani", date: "25/07/2026", sanitaires: 14, facades: 4, sousSol: true, personnalisation: { peinture: "#3b5bdb", sol: "Béton ciré", eclairage: "Neutre" } },
+  { id: "SIM-2207", reference: "VL-FES-0119", type: "Villa", ville: "Fès", superficie: 520, etages: 2, chambres: 6, statut: "en_cours", auteur: "Nadia Tazi", date: "24/07/2026", sanitaires: 4, cuisines: 2, facades: 3, superficieJardin: 190, piscine: false, personnalisation: { peinture: "#6f7d4f", sol: "Zellige", eclairage: "Chaud" } },
+  { id: "SIM-2208", reference: "R2-RABA-0204", type: "Non commercial", ville: "Rabat", superficie: 275, etages: 2, chambres: 6, statut: "validee", auteur: "Hamza Idrissi", date: "23/07/2026", sanitaires: 4, cuisines: 2, facades: 2, appartementsParEtage: 2, personnalisation: { peinture: "#f2ede4", sol: "Parquet", eclairage: "Neutre" } },
+  { id: "SIM-2209", reference: "CM-TANG-0058", type: "Commercial", ville: "Tanger", superficie: 940, etages: 3, chambres: 0, statut: "generee", auteur: "Salma El Amrani", date: "22/07/2026", sanitaires: 6, facades: 5, sousSol: false, planTopographique: "topo-tanger-zone-franche.pdf", personnalisation: { peinture: "#4b5563", sol: "Carrelage", eclairage: "Froid" } },
+  { id: "SIM-2210", reference: "VL-CASA-0301", type: "Villa", ville: "Casablanca", superficie: 860, etages: 3, chambres: 7, statut: "generee", auteur: "Youssef Bennani", date: "21/07/2026", sanitaires: 6, cuisines: 2, facades: 4, sousSol: true, superficieJardin: 340, piscine: true, personnalisation: { peinture: "#3b5bdb", sol: "Parquet", eclairage: "Neutre" } },
+  { id: "SIM-2211", reference: "R2-AGAD-0146", type: "Non commercial", ville: "Agadir", superficie: 365, etages: 5, chambres: 15, statut: "en_cours", auteur: "Nadia Tazi", date: "20/07/2026", sanitaires: 10, cuisines: 5, facades: 3, appartementsParEtage: 3, sousSol: true, personnalisation: { peinture: "#d8c39a", sol: "Carrelage", eclairage: "Chaud" } },
+  { id: "SIM-2212", reference: "CM-MARR-0090", type: "Commercial", ville: "Marrakech", superficie: 1580, etages: 4, chambres: 0, statut: "rejetee", auteur: "Hamza Idrissi", date: "19/07/2026", sanitaires: 8, facades: 4, sousSol: true, personnalisation: { peinture: "#c4714a", sol: "Zellige", eclairage: "Chaud" } },
 ];
 
 export const trafficSeries = [
