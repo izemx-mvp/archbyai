@@ -396,14 +396,9 @@ export function AppShell({
   children: ReactNode;
   intensity?: "subtle" | "normal";
 }) {
-  const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const current = useCurrentNav();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    setCollapsed(localStorage.getItem(COLLAPSE_KEY) === "1");
-  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -416,106 +411,110 @@ export function AppShell({
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const toggleCollapsed = () =>
-    setCollapsed((c) => {
-      const next = !c;
-      localStorage.setItem(COLLAPSE_KEY, next ? "1" : "0");
-      return next;
-    });
-
   return (
     <TooltipProvider delayDuration={150}>
       <AuroraBackground intensity={intensity} />
-      <div className="flex min-h-screen w-full">
-        <aside
-          className={cn(
-            "sticky top-0 hidden h-screen shrink-0 overflow-visible border-r border-sidebar-border bg-sidebar/80 backdrop-blur-xl lg:block",
-            "transition-[width] duration-400 ease-[cubic-bezier(0.34,1.2,0.64,1)]",
-            collapsed ? "w-[76px]" : "w-[264px]",
-          )}
-        >
-          <SidebarInner collapsed={collapsed} />
-          <Button
-            variant="outline"
-            size="icon-sm"
-            aria-label={collapsed ? "Déplier le menu" : "Replier le menu"}
-            onClick={toggleCollapsed}
-            className="absolute -right-4 top-20 z-40 h-8 w-8 rounded-full"
-          >
-            <ChevronLeft className={cn("h-4 w-4 transition-transform duration-400", collapsed && "rotate-180")} />
-          </Button>
-        </aside>
+      <PointerFx />
+      <div className="tech-grid pointer-events-none fixed inset-0 -z-10 opacity-[0.35]" aria-hidden />
 
-        <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-30 border-b border-border/70 bg-background/70 backdrop-blur-xl">
-            <div className="flex h-16 items-center gap-3 px-4 sm:px-6">
-              <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" aria-label="Ouvrir le menu" className="lg:hidden">
-                    <Menu className="h-5 w-5" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-[280px] border-sidebar-border bg-sidebar p-0">
-                  <SheetTitle className="sr-only">Navigation</SheetTitle>
-                  <SidebarInner collapsed={false} onNavigate={() => setMobileOpen(false)} />
-                </SheetContent>
-              </Sheet>
+      <div className="flex min-h-screen w-full flex-col">
+        <header className="sticky top-0 z-40 px-3 pt-3 sm:px-5">
+          <div className="hud-glass mx-auto flex w-full max-w-[1600px] items-center gap-3 rounded-2xl px-3 py-2">
+            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label="Ouvrir le menu" className="lg:hidden">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[320px] border-sidebar-border bg-sidebar/95 p-0 backdrop-blur-2xl">
+                <SheetTitle className="sr-only">Navigation</SheetTitle>
+                <MobileNavGrid onNavigate={() => setMobileOpen(false)} />
+              </SheetContent>
+            </Sheet>
 
-              <div className="hidden min-w-0 items-center gap-2 text-sm md:flex">
-                <PanelsTopLeft className="h-4 w-4 shrink-0 text-muted-foreground" />
-                <Link to="/" className="text-muted-foreground transition-colors hover:text-foreground">
-                  Back-office
-                </Link>
-                <span className="text-muted-foreground/50">/</span>
-                <span className="truncate font-semibold">{current.label}</span>
-              </div>
+            <Link to="/" aria-label="ArchbyAI" className="shrink-0 rounded-xl">
+              <BrandLogo className="h-11" />
+            </Link>
 
-              <div className="ml-auto hidden w-full max-w-sm md:block">
+            <div className="mx-1 hidden h-8 w-px bg-border lg:block" />
+
+            <div className="hidden min-w-0 flex-1 lg:block">
+              <CommandDeck />
+            </div>
+
+            <div className="ml-auto flex shrink-0 items-center gap-1">
+              <div className="hidden w-56 xl:block 2xl:w-72">
                 <GlobalSearch id="recherche-globale" />
               </div>
-
-              <div className="ml-auto flex shrink-0 items-center gap-1 md:ml-0">
-                <ThemeToggle />
-                <NotificationsMenu />
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      aria-label="Menu utilisateur"
-                      className="ml-1 rounded-full ring-offset-background transition-transform duration-300 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    >
-                      <Avatar className="h-9 w-9 ring-2 ring-primary/25">
-                        <AvatarFallback className="bg-primary/10 text-xs font-bold text-primary">MT</AvatarFallback>
-                      </Avatar>
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 rounded-2xl shadow-elevated">
-                    <DropdownMenuLabel>
-                      <p className="text-sm font-semibold">Mohamed Toufella</p>
-                      <p className="text-xs font-normal text-muted-foreground">Administrateur</p>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onSelect={() => navigate({ to: "/parametres" })}>
-                      <UserCog className="mr-2 h-4 w-4" /> Mon profil
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => navigate({ to: "/parametres" })}>
-                      <Settings className="mr-2 h-4 w-4" /> Paramètres
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-destructive" onSelect={() => navigate({ to: "/connexion" })}>
-                      <LogOut className="mr-2 h-4 w-4" /> Se déconnecter
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Recherche globale"
+                    className="xl:hidden"
+                    onClick={() =>
+                      document.getElementById("recherche-globale-mobile")?.querySelector("input")?.focus()
+                    }
+                  >
+                    <Command className="h-[18px] w-[18px]" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Recherche · ⌘K</TooltipContent>
+              </Tooltip>
+              <ThemeToggle />
+              <NotificationsMenu />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    aria-label="Menu utilisateur"
+                    className="ml-1 rounded-full ring-offset-background transition-transform duration-300 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    <Avatar className="h-9 w-9 ring-2 ring-primary/25">
+                      <AvatarFallback className="bg-primary/10 text-xs font-bold text-primary">MT</AvatarFallback>
+                    </Avatar>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 rounded-2xl shadow-elevated">
+                  <DropdownMenuLabel>
+                    <p className="text-sm font-semibold">Mohamed Toufella</p>
+                    <p className="text-xs font-normal text-muted-foreground">Administrateur</p>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onSelect={() => navigate({ to: "/parametres" })}>
+                    <UserCog className="mr-2 h-4 w-4" /> Mon profil
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => navigate({ to: "/parametres" })}>
+                    <Settings className="mr-2 h-4 w-4" /> Paramètres
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-destructive" onSelect={() => navigate({ to: "/connexion" })}>
+                    <LogOut className="mr-2 h-4 w-4" /> Se déconnecter
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-            <div className="border-t border-border/60 px-4 pb-3 pt-2 md:hidden">
-              <GlobalSearch />
-            </div>
-          </header>
+          </div>
 
-          <main className="mx-auto w-full max-w-[1500px] flex-1 space-y-6 px-4 py-6 sm:px-6 lg:py-8">{children}</main>
+          <div className="mx-auto mt-2 max-w-[1600px] xl:hidden">
+            <GlobalSearch id="recherche-globale-mobile" />
+          </div>
+        </header>
+
+        <div className="mx-auto flex w-full max-w-[1600px] items-center gap-2 px-5 pt-4 text-sm sm:px-7">
+          <Link to="/" className="text-muted-foreground transition-colors hover:text-foreground">
+            Back-office
+          </Link>
+          <span className="text-muted-foreground/50">/</span>
+          <span className="truncate font-semibold">{current.label}</span>
         </div>
+
+        <main className="mx-auto w-full max-w-[1600px] flex-1 space-y-6 px-4 py-5 pb-28 sm:px-6 lg:pb-10">
+          {children}
+        </main>
       </div>
+
+      <QuickDock />
     </TooltipProvider>
   );
 }
