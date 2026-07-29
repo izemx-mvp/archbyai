@@ -104,22 +104,22 @@ function ConnexionPage() {
   };
 
   return (
-    <div className="relative min-h-screen lg:grid lg:grid-cols-2">
+    <div className="relative min-h-svh lg:grid lg:h-svh lg:grid-cols-2 lg:overflow-hidden">
       <AuroraBackground intensity="vivid" />
 
-      <div className="flex min-h-screen items-center justify-center px-5 py-12 sm:px-10">
+      <div className="flex min-h-svh items-center justify-center px-5 py-8 sm:px-10 lg:min-h-0 lg:h-full lg:py-6">
         <div className="w-full max-w-md animate-rise">
-          <div className="mb-8 flex justify-center lg:justify-start">
-            <BrandLogo className="h-14" />
+          <div className="mb-5 flex justify-center lg:justify-start">
+            <BrandLogo className="h-12" />
           </div>
 
-          <div className="glass rounded-3xl p-7 shadow-elevated sm:p-9">
+          <div className="glass rounded-3xl p-6 shadow-elevated sm:p-8">
             <h1 className="text-2xl font-extrabold tracking-tight">Connexion au back-office</h1>
             <p className="mt-1.5 text-sm text-muted-foreground">
               Pilotez les API, services et simulations de plans d'architecture.
             </p>
 
-            <form onSubmit={submit} className="mt-7 space-y-4">
+            <form onSubmit={submit} className="mt-5 space-y-3.5">
               <Field
                 id="email"
                 label="Adresse e-mail"
@@ -168,7 +168,7 @@ function ConnexionPage() {
               </Button>
             </form>
 
-            <div className="mt-6 flex items-start gap-2.5 rounded-xl border border-border bg-muted/50 p-3">
+            <div className="mt-5 flex items-start gap-2.5 rounded-xl border border-border bg-muted/50 p-3">
               <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
               <p className="text-xs text-muted-foreground">
                 Mode démonstration : les identifiants sont pré-remplis pour tester l'application immédiatement.
@@ -176,7 +176,7 @@ function ConnexionPage() {
             </div>
           </div>
 
-          <p className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+          <p className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
             <ShieldCheck className="h-3.5 w-3.5" /> Accès sécurisé HTTPS · Données hébergées au Maroc & Azure
           </p>
         </div>
