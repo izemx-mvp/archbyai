@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { ArrowUpDown, Filter, RotateCcw, X, Inbox } from "lucide-react";
 
 import { EmptyState, TableSkeleton } from "@/components/page-parts";
@@ -82,8 +82,18 @@ export function DataTable<T extends { id: string }>({
     return data;
   }, [rows, query, active, sort, columns, searchKeys, matchFilter]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const current = filtered.slice((page - 1) * pageSize, page * pageSize);
+  const [perPage, setPerPage] = useState(pageSize);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const safePage = Math.min(page, totalPages);
+  const current = filtered.slice((safePage - 1) * perPage, safePage * perPage);
+
+  useEffect(() => {
+    if (page !== safePage) setPage(safePage);
+  }, [page, safePage]);
+
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1).filter(
+    (p) => p === 1 || p === totalPages || Math.abs(p - safePage) <= 1,
+  );
 
   return (
     <section className="overflow-hidden rounded-2xl border border-border bg-card/80 shadow-soft backdrop-blur-sm">
@@ -205,17 +215,53 @@ export function DataTable<T extends { id: string }>({
       )}
 
       <div className="flex flex-col items-center justify-between gap-3 border-t border-border px-4 py-3 sm:flex-row">
-        <p className="text-xs text-muted-foreground">
-          {filtered.length} résultat{filtered.length > 1 ? "s" : ""} · page {page} sur {totalPages}
-        </p>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-xs text-muted-foreground">
+            {filtered.length} résultat{filtered.length > 1 ? "s" : ""} · page {safePage} sur {totalPages}
+          </p>
+          <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            Lignes
+            <select
+              aria-label="Nombre de lignes par page"
+              value={perPage}
+              onChange={(e) => {
+                setPerPage(Number(e.target.value));
+                setPage(1);
+              }}
+              className="rounded-lg border border-border bg-card px-2 py-1 text-xs font-semibold text-foreground outline-none transition-colors focus:border-primary/60"
+            >
+              {[6, 10, 25, 50].map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <nav className="flex flex-wrap items-center gap-1" aria-label="Pagination">
+          <Button variant="outline" size="sm" disabled={safePage === 1} onClick={() => setPage(safePage - 1)}>
             Précédent
           </Button>
-          <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
+          {pageNumbers.map((p, i) => (
+            <span key={p} className="flex items-center gap-1">
+              {i > 0 && p - pageNumbers[i - 1] > 1 && (
+                <span className="px-1 text-xs text-muted-foreground">…</span>
+              )}
+              <Button
+                variant={p === safePage ? "hero" : "ghost"}
+                size="icon-sm"
+                aria-label={`Page ${p}`}
+                aria-current={p === safePage ? "page" : undefined}
+                onClick={() => setPage(p)}
+              >
+                {p}
+              </Button>
+            </span>
+          ))}
+          <Button variant="outline" size="sm" disabled={safePage >= totalPages} onClick={() => setPage(safePage + 1)}>
             Suivant
           </Button>
-        </div>
+        </nav>
       </div>
     </section>
   );
