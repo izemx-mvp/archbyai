@@ -30,7 +30,8 @@ import { StatusPill } from "@/components/status-pill";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { activites, apis, repartitionTypes, services, trafficSeries } from "@/lib/mock-data";
+import { repartitionTypes, trafficSeries } from "@/lib/mock-data";
+import { useData } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -102,11 +103,15 @@ function KpiCard({ kpi, ready, index }: { kpi: (typeof kpis)[number]; ready: boo
 }
 
 function Dashboard() {
+  const { state, ready: dataReady } = useData();
+  const { apis, services, notifications } = state;
+  const activites = notifications.slice(0, 5);
   const [ready, setReady] = useState(false);
   useEffect(() => {
-    const id = window.setTimeout(() => setReady(true), 500);
+    if (!dataReady) return;
+    const id = window.setTimeout(() => setReady(true), 400);
     return () => window.clearTimeout(id);
-  }, []);
+  }, [dataReady]);
 
   const chartColors = ["var(--color-chart-1)", "var(--color-chart-2)", "var(--color-chart-3)"];
 
