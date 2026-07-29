@@ -455,9 +455,10 @@ export function AppShell({
 
             <div className="mx-1 hidden h-8 w-px bg-border lg:block" />
 
-            <div className="hidden min-w-0 flex-1 lg:block">
+            <div className="hidden min-w-0 lg:block">
               <CommandDeck />
             </div>
+
 
             <div className="ml-auto flex shrink-0 items-center gap-1">
               <div className="hidden w-56 xl:block 2xl:w-72">
