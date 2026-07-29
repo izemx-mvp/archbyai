@@ -74,11 +74,11 @@
 :root {
   --radius: 0.875rem;
 
-  --background: oklch(0.985 0.006 250);
+  --background: oklch(0.982 0.011 258);
   --foreground: oklch(0.22 0.045 260);
-  --card: oklch(1 0 0);
+  --card: oklch(0.997 0.004 250);
   --card-foreground: oklch(0.22 0.045 260);
-  --popover: oklch(1 0 0);
+  --popover: oklch(0.998 0.003 250);
   --popover-foreground: oklch(0.22 0.045 260);
 
   --primary: oklch(0.42 0.13 263);
@@ -123,19 +123,19 @@
   --sidebar-border: oklch(0.91 0.012 252);
   --sidebar-ring: oklch(0.62 0.15 245);
 
-  --shadow-soft: 0 1px 2px oklch(0.3 0.05 260 / 0.06), 0 8px 24px oklch(0.3 0.05 260 / 0.06);
-  --shadow-elevated: 0 2px 6px oklch(0.3 0.05 260 / 0.08), 0 20px 48px oklch(0.3 0.05 260 / 0.12);
+  --shadow-soft: 0 1px 2px oklch(0.42 0.13 263 / 0.08), 0 10px 28px oklch(0.42 0.13 263 / 0.09);
+  --shadow-elevated: 0 2px 8px oklch(0.42 0.13 263 / 0.1), 0 24px 56px oklch(0.42 0.13 263 / 0.16);
   --gradient-brand: linear-gradient(135deg, var(--primary), var(--primary-glow));
   --glass-bg: oklch(1 0 0 / 0.72);
   --glass-border: oklch(1 0 0 / 0.6);
 }
 
 .dark {
-  --background: oklch(0.19 0.028 261);
+  --background: oklch(0.165 0.026 262);
   --foreground: oklch(0.96 0.008 250);
-  --card: oklch(0.235 0.03 261);
+  --card: oklch(0.215 0.029 262);
   --card-foreground: oklch(0.96 0.008 250);
-  --popover: oklch(0.235 0.03 261);
+  --popover: oklch(0.245 0.031 262);
   --popover-foreground: oklch(0.96 0.008 250);
 
   --primary: oklch(0.68 0.14 245);
@@ -171,7 +171,7 @@
   --chart-4: oklch(0.72 0.15 160);
   --chart-5: oklch(0.7 0.16 300);
 
-  --sidebar: oklch(0.215 0.03 261);
+  --sidebar: oklch(0.19 0.028 262);
   --sidebar-foreground: oklch(0.93 0.01 250);
   --sidebar-primary: oklch(0.68 0.14 245);
   --sidebar-primary-foreground: oklch(0.18 0.03 261);
@@ -375,5 +375,36 @@
     border-radius: 999px;
     border: 3px solid transparent;
     background-clip: content-box;
+  }
+}
+
+@keyframes spin-ring {
+  to {
+    --ring-angle: 360deg;
+  }
+}
+
+@property --ring-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes pulse-success {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--success) 55%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 14px transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.08s !important;
   }
 }
