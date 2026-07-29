@@ -101,18 +101,19 @@ function CommandDeck() {
       />
       {navigation.map((item) => {
         const active = pathname === item.to;
-        return (
+        const link = (
           <Link
             key={item.to}
             to={item.to}
             ref={(el) => {
               itemRefs.current[item.to] = el;
             }}
+            aria-label={item.label}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "sheen group relative z-10 flex h-10 shrink-0 items-center gap-2 rounded-full px-3.5 text-[13px] font-semibold",
-              "transition-[color,transform] duration-300 ease-[cubic-bezier(0.34,1.4,0.64,1)] hover:-translate-y-0.5",
-              active ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground",
+              "sheen group relative z-10 flex h-10 shrink-0 items-center gap-2 rounded-full px-3 text-[13px] font-semibold",
+              "transition-[color,transform,padding] duration-300 ease-[cubic-bezier(0.34,1.4,0.64,1)] hover:-translate-y-0.5",
+              active ? "px-4 text-primary-foreground" : "text-muted-foreground hover:text-foreground",
             )}
           >
             <item.icon
@@ -121,8 +122,24 @@ function CommandDeck() {
                 active && "drop-shadow-[0_0_6px_rgba(255,255,255,0.55)]",
               )}
             />
-            <span className="hidden xl:inline">{item.label}</span>
+            <span
+              className={cn(
+                "overflow-hidden whitespace-nowrap transition-all duration-400 ease-[cubic-bezier(0.34,1.3,0.64,1)]",
+                active ? "max-w-[200px] opacity-100" : "max-w-0 opacity-0",
+              )}
+            >
+              {item.label}
+            </span>
           </Link>
+        );
+
+        return active ? (
+          link
+        ) : (
+          <Tooltip key={item.to}>
+            <TooltipTrigger asChild>{link}</TooltipTrigger>
+            <TooltipContent sideOffset={10}>{item.label}</TooltipContent>
+          </Tooltip>
         );
       })}
     </div>
