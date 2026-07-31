@@ -623,18 +623,26 @@ function CaptureScene({ cible }: { cible: React.MutableRefObject<THREE.Scene | n
   return null;
 }
 
+/**
+ * Transition douce vers une vue prédéfinie. L'animation s'arrête dès qu'elle est
+ * terminée ou dès que l'utilisateur touche la souris : les contrôles d'orbite,
+ * le zoom et le pavé de navigation ne sont donc jamais « ramenés » de force.
+ */
 function Camera({
   vue,
+  tick,
   rayon,
   controls,
 }: {
   vue: string;
+  tick: number;
   rayon: number;
   controls: React.RefObject<OrbitControlsImpl | null>;
 }) {
   const { camera } = useThree();
   const cible = useRef(new THREE.Vector3(rayon * 1.1, rayon * 0.8, rayon * 1.3));
   const focus = useRef(new THREE.Vector3(0, rayon * 0.25, 0));
+  const anime = useRef(false);
 
   useEffect(() => {
     const presets: Record<string, [THREE.Vector3, THREE.Vector3]> = {
@@ -646,14 +654,35 @@ function Camera({
     const p = presets[vue] ?? presets.perspective;
     cible.current.copy(p[0]);
     focus.current.copy(p[1]);
-  }, [vue, rayon]);
+    anime.current = true;
+  }, [vue, tick, rayon]);
+
+  // Toute interaction souris annule la transition en cours.
+  useEffect(() => {
+    const c = controls.current;
+    if (!c) return;
+    const stop = () => {
+      anime.current = false;
+    };
+    c.addEventListener("start", stop);
+    return () => c.removeEventListener("start", stop);
+  }, [controls]);
 
   useFrame(() => {
-    camera.position.lerp(cible.current, 0.08);
+    if (!anime.current) return;
     const c = controls.current;
+    camera.position.lerp(cible.current, 0.12);
     if (c) {
-      c.target.lerp(focus.current, 0.08);
+      c.target.lerp(focus.current, 0.12);
       c.update();
+    }
+    if (camera.position.distanceTo(cible.current) < rayon * 0.004) {
+      camera.position.copy(cible.current);
+      if (c) {
+        c.target.copy(focus.current);
+        c.update();
+      }
+      anime.current = false;
     }
   });
   return null;
@@ -782,6 +811,7 @@ export default function Plan3DScene({
   const [etiquettes, setEtiquettes] = useState(true);
   const [ombres, setOmbres] = useState(true);
   const [vue, setVue] = useState("perspective");
+  const [vueTick, setVueTick] = useState(0);
   const [ghost, setGhost] = useState(false);
   const [pleinEcran, setPleinEcran] = useState(false);
   const controls = useRef<OrbitControlsImpl | null>(null);
@@ -818,6 +848,8 @@ export default function Plan3DScene({
     const c = controls.current;
     if (!c) return;
     setGhost(false);
+    // Annule une éventuelle transition de vue en cours pour ne pas la subir.
+    c.dispatchEvent({ type: "start" } as never);
     const cam = c.object as THREE.PerspectiveCamera;
     const offset = cam.position.clone().sub(c.target);
     const sph = new THREE.Spherical().setFromVector3(offset);
@@ -915,7 +947,7 @@ export default function Plan3DScene({
             maxDistance={rayon * 4}
             maxPolarAngle={Math.PI / 2.02}
           />
-          {!ghost && <Camera vue={vue} rayon={rayon} controls={controls} />}
+          {!ghost && <Camera vue={vue} tick={vueTick} rayon={rayon} controls={controls} />}
           <GhostControls actif={ghost} vitesse={Math.max(6, rayon * 0.55)} />
           <CaptureScene cible={sceneRef} />
         </Suspense>
@@ -936,6 +968,7 @@ export default function Plan3DScene({
               onClick={() => {
                 setGhost(false);
                 setVue(v.id);
+                setVueTick((t) => t + 1);
               }}
               className={cn(
                 "rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition-colors",
