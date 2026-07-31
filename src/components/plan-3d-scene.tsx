@@ -8,7 +8,8 @@ import * as THREE from "three";
 import { genererPieces } from "@/components/plan-2d";
 import type { Simulation } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
-import { Maximize2, Minimize2, Plus, Minus, RotateCcw, RotateCw, Crosshair, ArrowUp, ArrowDown } from "lucide-react";
+import { exporterGLB, exporterOBJ } from "@/lib/export-plan";
+import { Maximize2, Minimize2, Plus, Minus, RotateCcw, RotateCw, Crosshair, ArrowUp, ArrowDown, Box, Download } from "lucide-react";
 
 const HAUTEUR_ETAGE = 3;
 const EP_MUR_INT = 0.12;
