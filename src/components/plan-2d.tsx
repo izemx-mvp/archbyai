@@ -1,6 +1,8 @@
 import { useCallback, useMemo, useRef, useState } from "react";
+import { FileDown, ImageDown } from "lucide-react";
 import type { Simulation } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
+import { exporterPNG, exporterSVG } from "@/lib/export-plan";
 
 /**
  * Plan 2D façon CAO (ArchiCAD) : murs épais avec poché, portes avec arc de
