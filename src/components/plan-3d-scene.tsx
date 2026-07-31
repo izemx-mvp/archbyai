@@ -1,4 +1,5 @@
 import { Suspense, useEffect, useMemo, useRef, useState, type ReactElement } from "react";
+import { createPortal } from "react-dom";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, Environment, Grid, Html, OrbitControls, Sky } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
@@ -7,6 +8,7 @@ import * as THREE from "three";
 import { genererPieces } from "@/components/plan-2d";
 import type { Simulation } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
+import { Maximize2, Minimize2, Plus, Minus, RotateCcw, RotateCw, Crosshair, ArrowUp, ArrowDown } from "lucide-react";
 
 const HAUTEUR_ETAGE = 3;
 const EP_MUR_INT = 0.12;
@@ -738,6 +740,21 @@ function GhostControls({ actif, vitesse }: { actif: boolean; vitesse: number }) 
   return null;
 }
 
+/** Bouton du pavé de navigation 3D. */
+function NavBtn({ onClick, label, children }: { onClick: () => void; label: string; children: ReactElement }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={label}
+      aria-label={label}
+      className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-all hover:bg-primary hover:text-primary-foreground active:scale-95"
+    >
+      {children}
+    </button>
+  );
+}
+
 export default function Plan3DScene({
   simulation,
   peinture,
@@ -756,7 +773,42 @@ export default function Plan3DScene({
   const [ombres, setOmbres] = useState(true);
   const [vue, setVue] = useState("perspective");
   const [ghost, setGhost] = useState(false);
+  const [pleinEcran, setPleinEcran] = useState(false);
   const controls = useRef<OrbitControlsImpl | null>(null);
+
+  useEffect(() => {
+    if (!pleinEcran) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setPleinEcran(false);
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [pleinEcran]);
+
+  /** Pilotage doux de la caméra depuis le pavé de navigation (zoom, rotation, hauteur, recentrage). */
+  const piloter = (action: "zoom+" | "zoom-" | "gauche" | "droite" | "haut" | "bas" | "recentrer") => {
+    const c = controls.current;
+    if (!c) return;
+    setGhost(false);
+    const cam = c.object as THREE.PerspectiveCamera;
+    const offset = cam.position.clone().sub(c.target);
+    const sph = new THREE.Spherical().setFromVector3(offset);
+    if (action === "zoom+") sph.radius = Math.max(2, sph.radius * 0.8);
+    if (action === "zoom-") sph.radius = Math.min(rayon * 4, sph.radius * 1.25);
+    if (action === "gauche") sph.theta += Math.PI / 10;
+    if (action === "droite") sph.theta -= Math.PI / 10;
+    if (action === "haut") sph.phi = Math.max(0.12, sph.phi - Math.PI / 16);
+    if (action === "bas") sph.phi = Math.min(Math.PI / 2.05, sph.phi + Math.PI / 16);
+    if (action === "recentrer") {
+      c.target.set(0, 0, 0);
+      sph.set(rayon * 1.7, Math.PI / 3.1, Math.PI / 4);
+    }
+    cam.position.copy(c.target.clone().add(new THREE.Vector3().setFromSpherical(sph)));
+    cam.updateProjectionMatrix();
+    c.update();
+  };
   const lum = ECLAIRAGES[eclairage] ?? ECLAIRAGES.Neutre;
   const rayon = Math.max(14, Math.sqrt(simulation.superficie) * 1.1 + etages * 2);
 
@@ -769,8 +821,13 @@ export default function Plan3DScene({
     return [Math.cos(az) * Math.cos(el) * r, Math.sin(el) * r + 6, Math.sin(az) * Math.cos(el) * r];
   }, [lum, rayon]);
 
-  return (
-    <div className="relative h-[560px] overflow-hidden rounded-2xl border border-border bg-gradient-brand-soft">
+  const viewer = (
+    <div
+      className={cn(
+        "overflow-hidden border border-border bg-gradient-brand-soft",
+        pleinEcran ? "fixed inset-0 z-[90] h-svh w-svw rounded-none" : "relative h-[560px] rounded-2xl",
+      )}
+    >
       <Canvas
         shadows={ombres}
         dpr={[1, 2]}
@@ -822,10 +879,12 @@ export default function Plan3DScene({
             makeDefault
             enabled={!ghost}
             enableDamping
-            dampingFactor={0.08}
-            rotateSpeed={0.8}
-            zoomSpeed={0.9}
-            panSpeed={0.8}
+            dampingFactor={0.06}
+            rotateSpeed={0.55}
+            zoomSpeed={0.75}
+            panSpeed={0.6}
+            zoomToCursor
+            screenSpacePanning
             minDistance={2}
             maxDistance={rayon * 4}
             maxPolarAngle={Math.PI / 2.02}
@@ -864,6 +923,14 @@ export default function Plan3DScene({
         <div className="pointer-events-auto flex flex-wrap items-center gap-1 rounded-xl border border-border bg-background/80 p-1 backdrop-blur">
           <button
             type="button"
+            onClick={() => setPleinEcran((f) => !f)}
+            title={pleinEcran ? "Quitter le plein écran (Échap)" : "Plein écran"}
+            className="rounded-lg px-2 py-1.5 text-muted-foreground transition-colors hover:text-foreground"
+          >
+            {pleinEcran ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+          </button>
+          <button
+            type="button"
             onClick={() => setGhost((g) => !g)}
             className={cn("rounded-lg px-2.5 py-1.5 text-[11px] font-extrabold", ghost ? "bg-primary text-primary-foreground" : "text-primary")}
           >
@@ -893,6 +960,20 @@ export default function Plan3DScene({
         </div>
       </div>
 
+      {/* Pavé de navigation : rotation, hauteur, zoom et recentrage en un clic */}
+      <div className="pointer-events-auto absolute bottom-20 right-3 flex flex-col items-center gap-1 rounded-2xl border border-border bg-background/80 p-1.5 backdrop-blur">
+        <NavBtn onClick={() => piloter("haut")} label="Monter la vue"><ArrowUp className="h-4 w-4" /></NavBtn>
+        <div className="flex items-center gap-1">
+          <NavBtn onClick={() => piloter("gauche")} label="Pivoter à gauche"><RotateCcw className="h-4 w-4" /></NavBtn>
+          <NavBtn onClick={() => piloter("recentrer")} label="Recentrer la vue"><Crosshair className="h-4 w-4" /></NavBtn>
+          <NavBtn onClick={() => piloter("droite")} label="Pivoter à droite"><RotateCw className="h-4 w-4" /></NavBtn>
+        </div>
+        <NavBtn onClick={() => piloter("bas")} label="Descendre la vue"><ArrowDown className="h-4 w-4" /></NavBtn>
+        <div className="my-0.5 h-px w-8 bg-border" />
+        <NavBtn onClick={() => piloter("zoom+")} label="Zoomer"><Plus className="h-4 w-4" /></NavBtn>
+        <NavBtn onClick={() => piloter("zoom-")} label="Dézoomer"><Minus className="h-4 w-4" /></NavBtn>
+      </div>
+
       <div className="pointer-events-auto absolute bottom-3 left-3 right-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-background/80 px-3 py-2 text-[11px] font-semibold text-muted-foreground backdrop-blur">
         <label className="flex items-center gap-2">
           Coupe · niveaux {etagesVisibles}/{etages}
@@ -913,4 +994,14 @@ export default function Plan3DScene({
       </div>
     </div>
   );
+
+  if (pleinEcran && typeof document !== "undefined") {
+    return (
+      <>
+        <div className="relative h-[560px] rounded-2xl border border-dashed border-border bg-muted/30" />
+        {createPortal(viewer, document.body)}
+      </>
+    );
+  }
+  return viewer;
 }
