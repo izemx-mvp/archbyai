@@ -81,6 +81,188 @@ function useTextureSol(sol: string) {
   }, [sol]);
 }
 
+const STYLES: Record<string, { mur: string; toit: string; accent: string; sol: string }> = {
+  Moderne: { mur: "#f1efe9", toit: "#4b5563", accent: "#1f2937", sol: "#c9c5bc" },
+  "Traditionnel marocain": { mur: "#e8d4b0", toit: "#8c5a3c", accent: "#1f6f8b", sol: "#cbb894" },
+  Minimaliste: { mur: "#fafafa", toit: "#9ca3af", accent: "#111827", sol: "#d8d6d1" },
+  Méditerranéen: { mur: "#fdf6e8", toit: "#c05a3a", accent: "#2563a8", sol: "#d6cbb2" },
+};
+
+/** Arbre / palmier procédural pour le jardin. */
+function Arbre({ position, palmier }: { position: [number, number, number]; palmier: boolean }) {
+  return (
+    <group position={position}>
+      <mesh castShadow position={[0, palmier ? 2.4 : 1.1, 0]}>
+        <cylinderGeometry args={[palmier ? 0.16 : 0.22, palmier ? 0.22 : 0.3, palmier ? 4.8 : 2.2, 8]} />
+        <meshStandardMaterial color={palmier ? "#9b7b४f".replace("४", "4") : "#6b4b32"} roughness={1} />
+      </mesh>
+      {palmier ? (
+        Array.from({ length: 7 }).map((_, i) => (
+          <mesh key={i} castShadow position={[0, 4.7, 0]} rotation={[0.6, (i / 7) * Math.PI * 2, 0]}>
+            <coneGeometry args={[0.35, 2.6, 4]} />
+            <meshStandardMaterial color="#3f7d40" roughness={0.9} />
+          </mesh>
+        ))
+      ) : (
+        <mesh castShadow position={[0, 2.6, 0]}>
+          <sphereGeometry args={[1.25, 16, 12]} />
+          <meshStandardMaterial color="#3f7d40" roughness={1} />
+        </mesh>
+      )}
+    </group>
+  );
+}
+
+/** Aménagements extérieurs pilotés par la configuration de la simulation. */
+function Exterieurs({
+  sim,
+  largeur,
+  profondeur,
+  style,
+  hauteurTotale,
+}: {
+  sim: Simulation;
+  largeur: number;
+  profondeur: number;
+  style: { mur: string; toit: string; accent: string; sol: string };
+  hauteurTotale: number;
+}) {
+  const terrainX = largeur * 2.4;
+  const terrainZ = profondeur * 2.6;
+  const arbres = useMemo(() => {
+    const n = Math.max(0, Math.min(24, sim.arbres ?? 0));
+    return Array.from({ length: n }).map((_, i) => {
+      const angle = (i / Math.max(1, n)) * Math.PI * 2 + 0.6;
+      const r = Math.min(terrainX, terrainZ) * (0.34 + ((i * 7) % 5) * 0.035);
+      return {
+        pos: [Math.cos(angle) * r, 0, Math.sin(angle) * r] as [number, number, number],
+        palmier: i % 3 !== 0,
+      };
+    });
+  }, [sim.arbres, terrainX, terrainZ]);
+
+  const px = largeur * 0.78;
+  const pz = profondeur * 0.55;
+
+  return (
+    <group>
+      {/* jardin engazonné */}
+      {sim.jardin && (
+        <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
+          <planeGeometry args={[terrainX * 0.96, terrainZ * 0.96]} />
+          <meshStandardMaterial color="#6f9e5b" roughness={1} />
+        </mesh>
+      )}
+
+      {/* piscine : bassin creusé + margelle */}
+      {sim.piscine && (
+        <group position={[px, 0, pz]}>
+          <mesh receiveShadow position={[0, 0.02, 0]}>
+            <boxGeometry args={[largeur * 0.52, 0.08, profondeur * 0.42]} />
+            <meshStandardMaterial color="#efe9dc" roughness={0.8} />
+          </mesh>
+          <mesh position={[0, -0.35, 0]}>
+            <boxGeometry args={[largeur * 0.42, 0.8, profondeur * 0.32]} />
+            <meshStandardMaterial color="#1f6f8b" roughness={0.3} />
+          </mesh>
+          <mesh position={[0, 0.03, 0]}>
+            <boxGeometry args={[largeur * 0.42, 0.02, profondeur * 0.32]} />
+            <meshPhysicalMaterial color="#39b4dd" roughness={0.05} metalness={0.1} transmission={0.6} thickness={1.2} transparent opacity={0.85} />
+          </mesh>
+          <mesh castShadow position={[largeur * 0.28, 0.5, 0]}>
+            <boxGeometry args={[0.7, 0.12, 1.9]} />
+            <meshStandardMaterial color="#c9b18a" roughness={0.9} />
+          </mesh>
+        </group>
+      )}
+
+      {/* terrasse + pergola */}
+      {sim.terrasse && (
+        <group position={[-largeur * 0.72, 0, profondeur * 0.3]}>
+          <mesh receiveShadow position={[0, 0.06, 0]}>
+            <boxGeometry args={[largeur * 0.5, 0.12, profondeur * 0.5]} />
+            <meshStandardMaterial color="#cbb193" roughness={0.85} />
+          </mesh>
+          {[[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([sx, sz], i) => (
+            <mesh key={i} castShadow position={[(sx * largeur * 0.5) / 2.3, 1.3, (sz * profondeur * 0.5) / 2.3]}>
+              <boxGeometry args={[0.14, 2.6, 0.14]} />
+              <meshStandardMaterial color={style.accent} roughness={0.8} />
+            </mesh>
+          ))}
+          {Array.from({ length: 6 }).map((_, i) => (
+            <mesh key={`p${i}`} castShadow position={[0, 2.62, -profondeur * 0.2 + (i * profondeur * 0.4) / 5]}>
+              <boxGeometry args={[largeur * 0.5, 0.08, 0.1]} />
+              <meshStandardMaterial color={style.accent} roughness={0.8} />
+            </mesh>
+          ))}
+        </group>
+      )}
+
+      {/* garage */}
+      {sim.garage && (
+        <group position={[-largeur * 0.85, 0, -profondeur * 0.75]}>
+          <mesh castShadow receiveShadow position={[0, 1.35, 0]}>
+            <boxGeometry args={[5.2, 2.7, 5.4]} />
+            <meshStandardMaterial color={style.mur} roughness={0.9} />
+          </mesh>
+          <mesh position={[0, 1.15, 2.75]}>
+            <boxGeometry args={[3.6, 2.2, 0.1]} />
+            <meshStandardMaterial color={style.accent} roughness={0.5} metalness={0.3} />
+          </mesh>
+          <mesh castShadow position={[0, 2.78, 0]}>
+            <boxGeometry args={[5.6, 0.16, 5.8]} />
+            <meshStandardMaterial color={style.toit} roughness={0.9} />
+          </mesh>
+        </group>
+      )}
+
+      {/* clôture + portail */}
+      {sim.cloture && (
+        <group>
+          {[
+            { p: [0, 0.9, -terrainZ / 2] as [number, number, number], a: [terrainX, 1.8, 0.18] as [number, number, number] },
+            { p: [-terrainX / 2, 0.9, 0] as [number, number, number], a: [0.18, 1.8, terrainZ] as [number, number, number] },
+            { p: [terrainX / 2, 0.9, 0] as [number, number, number], a: [0.18, 1.8, terrainZ] as [number, number, number] },
+            { p: [-terrainX * 0.3, 0.9, terrainZ / 2] as [number, number, number], a: [terrainX * 0.4, 1.8, 0.18] as [number, number, number] },
+            { p: [terrainX * 0.3, 0.9, terrainZ / 2] as [number, number, number], a: [terrainX * 0.4, 1.8, 0.18] as [number, number, number] },
+          ].map((m, i) => (
+            <mesh key={i} castShadow receiveShadow position={m.p}>
+              <boxGeometry args={m.a} />
+              <meshStandardMaterial color={style.mur} roughness={0.95} />
+            </mesh>
+          ))}
+          <mesh position={[0, 0.85, terrainZ / 2]}>
+            <boxGeometry args={[terrainX * 0.2, 1.7, 0.08]} />
+            <meshStandardMaterial color={style.accent} metalness={0.5} roughness={0.4} />
+          </mesh>
+        </group>
+      )}
+
+      {/* allée d'accès */}
+      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.012, terrainZ * 0.34]}>
+        <planeGeometry args={[3.2, terrainZ * 0.3]} />
+        <meshStandardMaterial color="#b9b2a5" roughness={1} />
+      </mesh>
+
+      {/* panneaux solaires en toiture */}
+      {sim.panneauxSolaires && (
+        <group position={[0, hauteurTotale + 0.35, 0]}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <mesh key={i} castShadow rotation={[-0.35, 0, 0]} position={[-largeur * 0.28 + (i % 3) * largeur * 0.28, 0.2, i < 3 ? -profondeur * 0.18 : profondeur * 0.18]}>
+              <boxGeometry args={[largeur * 0.24, 0.06, profondeur * 0.2]} />
+              <meshStandardMaterial color="#12233d" metalness={0.6} roughness={0.25} />
+            </mesh>
+          ))}
+        </group>
+      )}
+
+      {arbres.map((a, i) => (
+        <Arbre key={i} position={a.pos} palmier={a.palmier} />
+      ))}
+    </group>
+  );
+}
+
 type Segment = { x: number; z: number; l: number; vertical: boolean };
 
 /** Découpe un mur en tronçons de part et d'autre d'une ouverture centrale. */
