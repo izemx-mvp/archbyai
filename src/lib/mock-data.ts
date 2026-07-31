@@ -62,6 +62,16 @@ export type Simulation = {
   superficieJardin?: number;
   piscine?: boolean;
   planTopographique?: string;
+  /** Aménagements extérieurs et parti architectural (impactent directement le rendu 3D). */
+  jardin?: boolean;
+  terrasse?: boolean;
+  garage?: boolean;
+  cloture?: boolean;
+  panneauxSolaires?: boolean;
+  arbres?: number;
+  style?: "Moderne" | "Traditionnel marocain" | "Minimaliste" | "Méditerranéen";
+  toiture?: "Plate" | "Tuiles" | "Terrasse accessible";
+  description?: string;
   /** Personnalisation de la vue 3D (cahier des charges §5.3). */
   personnalisation?: {
     peinture: string;
