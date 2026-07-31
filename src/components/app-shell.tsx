@@ -47,7 +47,6 @@ const navigation = [
   { to: "/simulations", label: "Mes simulations", icon: Building2 },
   { to: "/tarifs", label: "Tarifs", icon: CreditCard },
   { to: "/mon-abonnement", label: "Mon abonnement", icon: Receipt },
-  { to: "/parametres", label: "Paramètres", icon: Settings },
 ] as const;
 
 export function useCurrentNav() {
@@ -494,11 +493,8 @@ export function AppShell({
                     <p className="text-xs font-normal text-muted-foreground">Administrateur</p>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onSelect={() => navigate({ to: "/parametres" })}>
-                    <UserCog className="mr-2 h-4 w-4" /> Mon profil
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => navigate({ to: "/parametres" })}>
-                    <Settings className="mr-2 h-4 w-4" /> Paramètres
+                  <DropdownMenuItem onSelect={() => navigate({ to: "/mon-abonnement" })}>
+                    <UserCog className="mr-2 h-4 w-4" /> Mon abonnement
                   </DropdownMenuItem>
                   <DropdownMenuItem onSelect={() => navigate({ to: "/connexion" })}>
                     <ShieldCheck className="mr-2 h-4 w-4" /> Changer d'espace
