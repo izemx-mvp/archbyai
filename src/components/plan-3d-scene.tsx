@@ -950,6 +950,24 @@ export default function Plan3DScene({
         <div className="pointer-events-auto flex flex-wrap items-center gap-1 rounded-xl border border-border bg-background/80 p-1 backdrop-blur">
           <button
             type="button"
+            onClick={() => exporterModele("obj")}
+            disabled={export3D !== null}
+            title="Exporter en OBJ (Adobe Dimension / Substance 3D / Aero)"
+            className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+          >
+            <Box className="h-3.5 w-3.5" /> {export3D === "obj" ? "Export…" : "OBJ"}
+          </button>
+          <button
+            type="button"
+            onClick={() => exporterModele("glb")}
+            disabled={export3D !== null}
+            title="Exporter en GLB / glTF (Adobe Dimension, Aero)"
+            className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+          >
+            <Download className="h-3.5 w-3.5" /> {export3D === "glb" ? "Export…" : "GLB"}
+          </button>
+          <button
+            type="button"
             onClick={() => setPleinEcran((f) => !f)}
             title={pleinEcran ? "Quitter le plein écran (Échap)" : "Plein écran"}
             className="rounded-lg px-2 py-1.5 text-muted-foreground transition-colors hover:text-foreground"
