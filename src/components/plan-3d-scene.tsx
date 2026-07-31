@@ -614,6 +614,15 @@ function Batiment({
   );
 }
 
+/** Expose la scène three.js au composant parent (pour les exports OBJ / GLB). */
+function CaptureScene({ cible }: { cible: React.MutableRefObject<THREE.Scene | null> }) {
+  const { scene } = useThree();
+  useEffect(() => {
+    cible.current = scene;
+  }, [scene, cible]);
+  return null;
+}
+
 function Camera({
   vue,
   rayon,
