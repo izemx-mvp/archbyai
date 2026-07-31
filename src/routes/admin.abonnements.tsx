@@ -28,11 +28,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AdminPlans } from "@/components/admin-plans";
 import { useBilling } from "@/lib/billing-store";
 import {
   formatMAD,
   planParId,
-  plans,
   type AbonnementClient,
   type PlanId,
   type Periodicite,
@@ -136,7 +137,7 @@ function AdminAbonnements() {
         </div>
       ),
     },
-    { key: "plan", header: "Plan", sortable: true, value: (r) => r.plan, cell: (r) => <StatusPill tone="brand" dot={false}>{planParId(r.plan).nom}</StatusPill> },
+    { key: "plan", header: "Plan", sortable: true, value: (r) => r.plan, cell: (r) => <StatusPill tone="brand" dot={false}>{planParId(r.plan, state.plans).nom}</StatusPill> },
     { key: "periodicite", header: "Cycle", cell: (r) => <span className="capitalize text-muted-foreground">{r.periodicite}</span> },
     { key: "montant", header: "Montant", sortable: true, value: (r) => r.montant, cell: (r) => <span className="font-bold tabular-nums">{formatMAD(r.montant)}</span> },
     { key: "debut", header: "Début", sortable: true, value: (r) => r.debut, cell: (r) => <span className="whitespace-nowrap text-muted-foreground">{r.debut}</span> },
@@ -177,14 +178,28 @@ function AdminAbonnements() {
   return (
     <>
       <PageHeader
-        titre="Abonnements"
+        titre="Gestion des abonnements"
         description={`${state.abonnements.filter((a) => a.statut === "actif").length} abonnements actifs sur ${state.abonnements.length}.`}
-        actions={
-          <Button variant="hero" onClick={ouvrirCreation}>
-            <Plus className="h-4 w-4" /> Nouvel abonnement
-          </Button>
-        }
       />
+
+      <Tabs defaultValue="abonnes" className="space-y-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <TabsList>
+            <TabsTrigger value="plans">Gestion des plans</TabsTrigger>
+            <TabsTrigger value="abonnes">Liste des abonnés</TabsTrigger>
+          </TabsList>
+        </div>
+
+        <TabsContent value="plans" className="space-y-5">
+          <AdminPlans />
+        </TabsContent>
+
+        <TabsContent value="abonnes" className="space-y-5">
+          <div className="flex justify-end">
+            <Button variant="hero" onClick={ouvrirCreation}>
+              <Plus className="h-4 w-4" /> Nouvel abonnement
+            </Button>
+          </div>
 
       <DataTable
         rows={state.abonnements}
@@ -192,7 +207,7 @@ function AdminAbonnements() {
         loading={!ready}
         pageSize={10}
         searchPlaceholder="Rechercher un client, un identifiant d'abonnement…"
-        searchKeys={(r) => `${r.client} ${r.email} ${r.id} ${planParId(r.plan).nom}`}
+        searchKeys={(r) => `${r.client} ${r.email} ${r.id} ${planParId(r.plan, state.plans).nom}`}
         filters={[
           { id: "statut", label: "Statut", options: [
             { value: "actif", label: "Actif" },
@@ -200,7 +215,7 @@ function AdminAbonnements() {
             { value: "annule", label: "Résilié" },
             { value: "expire", label: "Expiré" },
           ] },
-          { id: "plan", label: "Plan", options: plans.map((p) => ({ value: p.id, label: p.nom })) },
+          { id: "plan", label: "Plan", options: state.plans.map((p) => ({ value: p.id, label: p.nom })) },
           { id: "periode", label: "Période", options: [
             { value: "2026-s1", label: "Début S1 2026" },
             { value: "2026-s2", label: "Début S2 2026" },
@@ -215,6 +230,8 @@ function AdminAbonnements() {
         emptyTitle="Aucun abonnement"
         emptyDescription="Modifiez les filtres pour afficher d'autres abonnements."
       />
+        </TabsContent>
+      </Tabs>
 
       {/* Détail */}
       <Dialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
@@ -226,7 +243,7 @@ function AdminAbonnements() {
           {detail && (
             <dl className="space-y-3 text-sm">
               {[
-                ["Plan", planParId(detail.plan).nom],
+                ["Plan", planParId(detail.plan, state.plans).nom],
                 ["Cycle", detail.periodicite],
                 ["Montant", formatMAD(detail.montant)],
                 ["Remise", detail.remise ? `${detail.remise} %` : "—"],
@@ -268,7 +285,7 @@ function AdminAbonnements() {
               <Select value={choix.plan} onValueChange={(v) => setChoix({ ...choix, plan: v as PlanId })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {plans.map((p) => <SelectItem key={p.id} value={p.id}>{p.nom}</SelectItem>)}
+                  {state.plans.map((p) => <SelectItem key={p.id} value={p.id}>{p.nom}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -289,7 +306,7 @@ function AdminAbonnements() {
               variant="hero"
               onClick={() => {
                 if (!planDialog) return;
-                const p = planParId(choix.plan);
+                const p = planParId(choix.plan, state.plans);
                 changerPlan(planDialog.id, choix.plan, choix.periodicite, choix.periodicite === "mensuel" ? p.prixMensuel : p.prixAnnuel);
                 toast.success(`${planDialog.client} est passé au plan ${p.nom}.`);
                 setPlanDialog(null);
@@ -356,12 +373,12 @@ function AdminAbonnements() {
               <Select
                 value={form.plan}
                 onValueChange={(v) => {
-                  const p = planParId(v as PlanId);
+                  const p = planParId(v as PlanId, state.plans);
                   setForm({ ...form, plan: v as PlanId, montant: form.periodicite === "mensuel" ? p.prixMensuel : p.prixAnnuel });
                 }}
               >
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{plans.map((p) => <SelectItem key={p.id} value={p.id}>{p.nom}</SelectItem>)}</SelectContent>
+                <SelectContent>{state.plans.map((p) => <SelectItem key={p.id} value={p.id}>{p.nom}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
