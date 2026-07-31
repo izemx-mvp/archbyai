@@ -1,4 +1,5 @@
 import { Suspense, useEffect, useMemo, useRef, useState, type ReactElement } from "react";
+import { createPortal } from "react-dom";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, Environment, Grid, Html, OrbitControls, Sky } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
@@ -820,7 +821,7 @@ export default function Plan3DScene({
     return [Math.cos(az) * Math.cos(el) * r, Math.sin(el) * r + 6, Math.sin(az) * Math.cos(el) * r];
   }, [lum, rayon]);
 
-  return (
+  const viewer = (
     <div
       className={cn(
         "overflow-hidden border border-border bg-gradient-brand-soft",
@@ -993,4 +994,14 @@ export default function Plan3DScene({
       </div>
     </div>
   );
+
+  if (pleinEcran && typeof document !== "undefined") {
+    return (
+      <>
+        <div className="relative h-[560px] rounded-2xl border border-dashed border-border bg-muted/30" />
+        {createPortal(viewer, document.body)}
+      </>
+    );
+  }
+  return viewer;
 }
