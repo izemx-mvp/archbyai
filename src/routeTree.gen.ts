@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TarifsRouteImport } from './routes/tarifs'
 import { Route as SimulationsRouteImport } from './routes/simulations'
-import { Route as ParametresRouteImport } from './routes/parametres'
 import { Route as NouvelleSimulationRouteImport } from './routes/nouvelle-simulation'
 import { Route as MonAbonnementRouteImport } from './routes/mon-abonnement'
 import { Route as ConnexionRouteImport } from './routes/connexion'
@@ -32,11 +31,6 @@ const TarifsRoute = TarifsRouteImport.update({
 const SimulationsRoute = SimulationsRouteImport.update({
   id: '/simulations',
   path: '/simulations',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ParametresRoute = ParametresRouteImport.update({
-  id: '/parametres',
-  path: '/parametres',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NouvelleSimulationRoute = NouvelleSimulationRouteImport.update({
@@ -101,7 +95,6 @@ export interface FileRoutesByFullPath {
   '/connexion': typeof ConnexionRoute
   '/mon-abonnement': typeof MonAbonnementRoute
   '/nouvelle-simulation': typeof NouvelleSimulationRoute
-  '/parametres': typeof ParametresRoute
   '/simulations': typeof SimulationsRoute
   '/tarifs': typeof TarifsRoute
   '/admin/abonnements': typeof AdminAbonnementsRoute
@@ -116,7 +109,6 @@ export interface FileRoutesByTo {
   '/connexion': typeof ConnexionRoute
   '/mon-abonnement': typeof MonAbonnementRoute
   '/nouvelle-simulation': typeof NouvelleSimulationRoute
-  '/parametres': typeof ParametresRoute
   '/simulations': typeof SimulationsRoute
   '/tarifs': typeof TarifsRoute
   '/admin/abonnements': typeof AdminAbonnementsRoute
@@ -133,7 +125,6 @@ export interface FileRoutesById {
   '/connexion': typeof ConnexionRoute
   '/mon-abonnement': typeof MonAbonnementRoute
   '/nouvelle-simulation': typeof NouvelleSimulationRoute
-  '/parametres': typeof ParametresRoute
   '/simulations': typeof SimulationsRoute
   '/tarifs': typeof TarifsRoute
   '/admin/abonnements': typeof AdminAbonnementsRoute
@@ -151,7 +142,6 @@ export interface FileRouteTypes {
     | '/connexion'
     | '/mon-abonnement'
     | '/nouvelle-simulation'
-    | '/parametres'
     | '/simulations'
     | '/tarifs'
     | '/admin/abonnements'
@@ -166,7 +156,6 @@ export interface FileRouteTypes {
     | '/connexion'
     | '/mon-abonnement'
     | '/nouvelle-simulation'
-    | '/parametres'
     | '/simulations'
     | '/tarifs'
     | '/admin/abonnements'
@@ -182,7 +171,6 @@ export interface FileRouteTypes {
     | '/connexion'
     | '/mon-abonnement'
     | '/nouvelle-simulation'
-    | '/parametres'
     | '/simulations'
     | '/tarifs'
     | '/admin/abonnements'
@@ -199,7 +187,6 @@ export interface RootRouteChildren {
   ConnexionRoute: typeof ConnexionRoute
   MonAbonnementRoute: typeof MonAbonnementRoute
   NouvelleSimulationRoute: typeof NouvelleSimulationRoute
-  ParametresRoute: typeof ParametresRoute
   SimulationsRoute: typeof SimulationsRoute
   TarifsRoute: typeof TarifsRoute
   PlanReferenceRoute: typeof PlanReferenceRoute
@@ -219,13 +206,6 @@ declare module '@tanstack/react-router' {
       path: '/simulations'
       fullPath: '/simulations'
       preLoaderRoute: typeof SimulationsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/parametres': {
-      id: '/parametres'
-      path: '/parametres'
-      fullPath: '/parametres'
-      preLoaderRoute: typeof ParametresRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/nouvelle-simulation': {
@@ -332,7 +312,6 @@ const rootRouteChildren: RootRouteChildren = {
   ConnexionRoute: ConnexionRoute,
   MonAbonnementRoute: MonAbonnementRoute,
   NouvelleSimulationRoute: NouvelleSimulationRoute,
-  ParametresRoute: ParametresRoute,
   SimulationsRoute: SimulationsRoute,
   TarifsRoute: TarifsRoute,
   PlanReferenceRoute: PlanReferenceRoute,
@@ -340,3 +319,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

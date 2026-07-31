@@ -13,7 +13,6 @@ import {
   Receipt,
   Search,
   ShieldCheck,
-  Settings,
   Sparkles,
   Sun,
   UserCog,
