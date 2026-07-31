@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { useData } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import type { Simulation } from "@/lib/mock-data";
@@ -55,6 +56,15 @@ type Criteres = {
   appartementsParEtage: number;
   superficieJardin: number;
   piscine: boolean;
+  jardin: boolean;
+  terrasse: boolean;
+  garage: boolean;
+  cloture: boolean;
+  panneauxSolaires: boolean;
+  arbres: number;
+  style: NonNullable<Simulation["style"]>;
+  toiture: NonNullable<Simulation["toiture"]>;
+  description: string;
 };
 
 const defaut: Criteres = {
@@ -69,7 +79,38 @@ const defaut: Criteres = {
   appartementsParEtage: 2,
   superficieJardin: 150,
   piscine: false,
+  jardin: true,
+  terrasse: true,
+  garage: true,
+  cloture: true,
+  panneauxSolaires: false,
+  arbres: 6,
+  style: "Moderne",
+  toiture: "Plate",
+  description: "",
 };
+
+/** Lit la description libre du client et en déduit les aménagements à modéliser en 3D. */
+function interpreterDescription(texte: string): Partial<Criteres> {
+  const t = texte.toLowerCase();
+  const a = (...mots: string[]) => mots.some((m) => t.includes(m));
+  const out: Partial<Criteres> = {};
+  if (a("piscine", "bassin")) out.piscine = true;
+  if (a("jardin", "gazon", "pelouse", "verdure")) out.jardin = true;
+  if (a("terrasse", "patio")) out.terrasse = true;
+  if (a("garage", "parking", "carport")) out.garage = true;
+  if (a("clôture", "cloture", "mur d'enceinte", "portail")) out.cloture = true;
+  if (a("solaire", "photovolta", "panneaux")) out.panneauxSolaires = true;
+  if (a("palmier", "arbre", "olivier")) out.arbres = 10;
+  if (a("traditionnel", "marocain", "riad", "zellige", "medina", "médina")) out.style = "Traditionnel marocain";
+  else if (a("minimalist", "épuré", "epure")) out.style = "Minimaliste";
+  else if (a("méditerran", "mediterran")) out.style = "Méditerranéen";
+  else if (a("moderne", "contemporain")) out.style = "Moderne";
+  if (a("tuile", "toit en pente", "pente")) out.toiture = "Tuiles";
+  else if (a("toit-terrasse", "toit terrasse", "rooftop", "terrasse accessible")) out.toiture = "Terrasse accessible";
+  if (a("sous-sol", "sous sol", "cave")) out.sousSol = true;
+  return out;
+}
 
 function ChampNombre({
   id,
@@ -104,6 +145,15 @@ function ChampNombre({
   );
 }
 
+function Bascule({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <label className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card/60 px-4 py-3">
+      <span className="text-sm font-medium">{label}</span>
+      <Switch checked={value} onCheckedChange={onChange} aria-label={label} />
+    </label>
+  );
+}
+
 function NouvelleSimulationPage() {
   const navigate = useNavigate();
   const { creerSimulation, journaliser, notifier } = useData();
@@ -119,6 +169,7 @@ function NouvelleSimulationPage() {
       toast.error("La superficie et le nombre d'étages doivent être supérieurs à 0.");
       return;
     }
+    const deduit = { ...c, ...interpreterDescription(c.description) };
     setGeneration(true);
     window.setTimeout(() => {
       const sim = creerSimulation({
@@ -132,10 +183,19 @@ function NouvelleSimulationPage() {
         sanitaires: c.sanitaires,
         cuisines: c.cuisines,
         facades: type === "Villa" ? undefined : c.facades,
-        sousSol: c.sousSol,
+        sousSol: deduit.sousSol,
         appartementsParEtage: type === "Villa" ? undefined : c.appartementsParEtage,
         superficieJardin: type === "Villa" ? c.superficieJardin : undefined,
-        piscine: type === "Villa" ? c.piscine : undefined,
+        piscine: type === "Villa" ? deduit.piscine : undefined,
+        jardin: type === "Villa" ? deduit.jardin : false,
+        terrasse: deduit.terrasse,
+        garage: deduit.garage,
+        cloture: type === "Villa" ? deduit.cloture : false,
+        panneauxSolaires: deduit.panneauxSolaires,
+        arbres: type === "Villa" && deduit.jardin ? deduit.arbres : 0,
+        style: deduit.style,
+        toiture: deduit.toiture,
+        description: c.description.trim() || undefined,
         planTopographique: fichier ?? undefined,
       });
       journaliser({
@@ -232,16 +292,63 @@ function NouvelleSimulationPage() {
                   onChange={(v) => set("superficieJardin", v)}
                 />
               )}
-              <label className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card/60 px-4 py-3">
-                <span className="text-sm font-medium">Avec sous-sol</span>
-                <Switch checked={c.sousSol} onCheckedChange={(v) => set("sousSol", v)} aria-label="Avec sous-sol" />
-              </label>
+              <Bascule label="Avec sous-sol" value={c.sousSol} onChange={(v) => set("sousSol", v)} />
+              <Bascule label="Terrasse" value={c.terrasse} onChange={(v) => set("terrasse", v)} />
+              <Bascule label="Garage / carport" value={c.garage} onChange={(v) => set("garage", v)} />
+              <Bascule label="Panneaux solaires" value={c.panneauxSolaires} onChange={(v) => set("panneauxSolaires", v)} />
               {type === "Villa" && (
-                <label className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card/60 px-4 py-3">
-                  <span className="text-sm font-medium">Avec piscine</span>
-                  <Switch checked={c.piscine} onCheckedChange={(v) => set("piscine", v)} aria-label="Avec piscine" />
-                </label>
+                <>
+                  <Bascule label="Avec piscine" value={c.piscine} onChange={(v) => set("piscine", v)} />
+                  <Bascule label="Jardin paysager" value={c.jardin} onChange={(v) => set("jardin", v)} />
+                  <Bascule label="Clôture & portail" value={c.cloture} onChange={(v) => set("cloture", v)} />
+                  {c.jardin && (
+                    <ChampNombre id="arbres" label="Arbres & palmiers" value={c.arbres} onChange={(v) => set("arbres", v)} />
+                  )}
+                </>
               )}
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-border bg-card/85 p-5 shadow-soft backdrop-blur-sm">
+            <h2 className="text-lg font-bold">3. Style & rendu 3D</h2>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="style">Style architectural</Label>
+                <Select value={c.style} onValueChange={(v) => set("style", v as Criteres["style"])}>
+                  <SelectTrigger id="style" className="h-11 rounded-xl"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {["Moderne", "Traditionnel marocain", "Minimaliste", "Méditerranéen"].map((v) => (
+                      <SelectItem key={v} value={v}>{v}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="toiture">Toiture</Label>
+                <Select value={c.toiture} onValueChange={(v) => set("toiture", v as Criteres["toiture"])}>
+                  <SelectTrigger id="toiture" className="h-11 rounded-xl"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {["Plate", "Tuiles", "Terrasse accessible"].map((v) => (
+                      <SelectItem key={v} value={v}>{v}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="description">Décrivez votre projet (l'IA en déduit les aménagements 3D)</Label>
+                <Textarea
+                  id="description"
+                  rows={4}
+                  value={c.description}
+                  onChange={(e) => set("description", e.target.value)}
+                  placeholder="Ex. : une villa moderne à Casablanca avec grand jardin, piscine, terrasse ombragée, palmiers et un toit-terrasse accessible."
+                  className="rounded-xl"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Mots-clés reconnus : piscine, jardin, terrasse, garage, clôture, panneaux solaires, palmiers, riad /
+                  traditionnel marocain, minimaliste, tuiles, toit-terrasse, sous-sol.
+                </p>
+              </div>
             </div>
           </section>
         </div>

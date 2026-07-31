@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useData } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -153,8 +154,22 @@ function PlanPage() {
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <StatusPill tone={statutMap[simulation.statut].tone}>{statutMap[simulation.statut].label}</StatusPill>
         <StatusPill tone="brand" dot={false}>{simulation.type}</StatusPill>
+        {simulation.style && <StatusPill tone="info" dot={false}>{simulation.style}</StatusPill>}
+        {simulation.toiture && <StatusPill tone="info" dot={false}>Toiture {simulation.toiture.toLowerCase()}</StatusPill>}
+        {simulation.piscine && <StatusPill tone="success" dot={false}>Piscine</StatusPill>}
+        {simulation.jardin && <StatusPill tone="success" dot={false}>Jardin {simulation.superficieJardin ? `${simulation.superficieJardin} m²` : ""}</StatusPill>}
+        {simulation.terrasse && <StatusPill tone="success" dot={false}>Terrasse</StatusPill>}
+        {simulation.garage && <StatusPill tone="success" dot={false}>Garage</StatusPill>}
+        {simulation.panneauxSolaires && <StatusPill tone="success" dot={false}>Panneaux solaires</StatusPill>}
+        {simulation.sousSol && <StatusPill tone="success" dot={false}>Sous-sol</StatusPill>}
         <span className="text-xs text-muted-foreground">Auteur : {simulation.auteur} · créée le {simulation.date}</span>
       </div>
+
+      {simulation.description && (
+        <p className="mb-4 rounded-2xl border border-border bg-card/70 p-4 text-sm italic text-muted-foreground shadow-soft backdrop-blur-sm">
+          « {simulation.description} »
+        </p>
+      )}
 
       <Tabs defaultValue="2d" className="space-y-4">
         <TabsList className="rounded-xl">
@@ -244,6 +259,32 @@ function PlanPage() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Aménagements extérieurs</Label>
+              {([
+                ["Piscine", "piscine"],
+                ["Jardin paysager", "jardin"],
+                ["Terrasse & pergola", "terrasse"],
+                ["Garage", "garage"],
+                ["Clôture & portail", "cloture"],
+                ["Panneaux solaires", "panneauxSolaires"],
+              ] as const).map(([label, cle]) => (
+                <label key={cle} className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card/60 px-3 py-2 text-sm">
+                  {label}
+                  <Switch
+                    checked={!!simulation[cle]}
+                    aria-label={label}
+                    onCheckedChange={(v) =>
+                      majSimulation(simulation.id, {
+                        [cle]: v,
+                        ...(cle === "jardin" && v && !simulation.arbres ? { arbres: 6 } : {}),
+                      })
+                    }
+                  />
+                </label>
+              ))}
             </div>
 
             <div className="flex flex-col gap-2">
