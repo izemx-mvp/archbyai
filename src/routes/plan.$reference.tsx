@@ -56,6 +56,7 @@ function PlanPage() {
   const simulation = state.simulations.find((s) => s.reference === reference);
 
   const [etage, setEtage] = useState(0);
+  const [plein2d, setPlein2d] = useState(false);
   const [peinture, setPeinture] = useState(OPTIONS_PEINTURE[0].valeur);
   const [sol, setSol] = useState<string>(OPTIONS_SOL[0]);
   const [eclairage, setEclairage] = useState<string>(OPTIONS_ECLAIRAGE[0]);
@@ -190,13 +191,39 @@ function PlanPage() {
                 </Button>
               ))}
             </div>
-            <Button variant="outline" size="sm" onClick={exporterSvg}>
-              <Download className="h-4 w-4" /> Exporter le plan
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setPlein2d(true)}>
+                <Maximize2 className="h-4 w-4" /> Plein écran
+              </Button>
+              <Button variant="outline" size="sm" onClick={exporterSvg}>
+                <Download className="h-4 w-4" /> Exporter le plan
+              </Button>
+            </div>
           </div>
           <div id="plan2d" className="rounded-2xl border border-border bg-card/85 p-4 shadow-soft backdrop-blur-sm">
             <Plan2D simulation={simulation} etage={etage} />
           </div>
+
+          {plein2d && (
+            <div className="fixed inset-0 z-[90] flex flex-col bg-background/98 backdrop-blur-sm">
+              <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="mr-2 text-sm font-bold">{simulation.reference}</span>
+                  {Array.from({ length: simulation.etages }).map((_, i) => (
+                    <Button key={i} variant={i === etage ? "hero" : "outline"} size="sm" onClick={() => setEtage(i)}>
+                      {i === 0 ? "RDC" : `Étage ${i}`}
+                    </Button>
+                  ))}
+                </div>
+                <Button variant="outline" size="sm" onClick={() => setPlein2d(false)}>
+                  <Minimize2 className="h-4 w-4" /> Quitter (Échap)
+                </Button>
+              </div>
+              <div className="flex-1 overflow-auto p-4">
+                <Plan2D simulation={simulation} etage={etage} />
+              </div>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="3d" className="grid gap-4 lg:grid-cols-[1fr_300px]">
