@@ -8,7 +8,8 @@ import * as THREE from "three";
 import { genererPieces } from "@/components/plan-2d";
 import type { Simulation } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
-import { Maximize2, Minimize2, Plus, Minus, RotateCcw, RotateCw, Crosshair, ArrowUp, ArrowDown } from "lucide-react";
+import { exporterGLB, exporterOBJ } from "@/lib/export-plan";
+import { Maximize2, Minimize2, Plus, Minus, RotateCcw, RotateCw, Crosshair, ArrowUp, ArrowDown, Box, Download } from "lucide-react";
 
 const HAUTEUR_ETAGE = 3;
 const EP_MUR_INT = 0.12;
@@ -613,6 +614,15 @@ function Batiment({
   );
 }
 
+/** Expose la scène three.js au composant parent (pour les exports OBJ / GLB). */
+function CaptureScene({ cible }: { cible: React.MutableRefObject<THREE.Scene | null> }) {
+  const { scene } = useThree();
+  useEffect(() => {
+    cible.current = scene;
+  }, [scene, cible]);
+  return null;
+}
+
 function Camera({
   vue,
   rayon,
@@ -775,6 +785,22 @@ export default function Plan3DScene({
   const [ghost, setGhost] = useState(false);
   const [pleinEcran, setPleinEcran] = useState(false);
   const controls = useRef<OrbitControlsImpl | null>(null);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const [export3D, setExport3D] = useState<null | "obj" | "glb">(null);
+
+  /** Export du modèle vers un format 3D lisible par Adobe (Dimension, Substance, Aero). */
+  const exporterModele = async (format: "obj" | "glb") => {
+    const scene = sceneRef.current;
+    if (!scene || export3D) return;
+    setExport3D(format);
+    const nom = `maquette-3d-${simulation.reference}`;
+    try {
+      if (format === "obj") await exporterOBJ(scene, nom);
+      else await exporterGLB(scene, nom);
+    } finally {
+      setExport3D(null);
+    }
+  };
 
   useEffect(() => {
     if (!pleinEcran) return;
@@ -891,6 +917,7 @@ export default function Plan3DScene({
           />
           {!ghost && <Camera vue={vue} rayon={rayon} controls={controls} />}
           <GhostControls actif={ghost} vitesse={Math.max(6, rayon * 0.55)} />
+          <CaptureScene cible={sceneRef} />
         </Suspense>
       </Canvas>
 
@@ -921,6 +948,24 @@ export default function Plan3DScene({
         </div>
 
         <div className="pointer-events-auto flex flex-wrap items-center gap-1 rounded-xl border border-border bg-background/80 p-1 backdrop-blur">
+          <button
+            type="button"
+            onClick={() => exporterModele("obj")}
+            disabled={export3D !== null}
+            title="Exporter en OBJ (Adobe Dimension / Substance 3D / Aero)"
+            className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+          >
+            <Box className="h-3.5 w-3.5" /> {export3D === "obj" ? "Export…" : "OBJ"}
+          </button>
+          <button
+            type="button"
+            onClick={() => exporterModele("glb")}
+            disabled={export3D !== null}
+            title="Exporter en GLB / glTF (Adobe Dimension, Aero)"
+            className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+          >
+            <Download className="h-3.5 w-3.5" /> {export3D === "glb" ? "Export…" : "GLB"}
+          </button>
           <button
             type="button"
             onClick={() => setPleinEcran((f) => !f)}
