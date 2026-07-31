@@ -947,7 +947,7 @@ export default function Plan3DScene({
             maxDistance={rayon * 4}
             maxPolarAngle={Math.PI / 2.02}
           />
-          {!ghost && <Camera vue={vue} rayon={rayon} controls={controls} />}
+          {!ghost && <Camera vue={vue} tick={vueTick} rayon={rayon} controls={controls} />}
           <GhostControls actif={ghost} vitesse={Math.max(6, rayon * 0.55)} />
           <CaptureScene cible={sceneRef} />
         </Suspense>
