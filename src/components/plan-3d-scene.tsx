@@ -647,6 +647,97 @@ function Camera({
   return null;
 }
 
+/** Caméra « fantôme » : vol libre sans collision (ZQSD/WASD + souris), inertie fluide. */
+function GhostControls({ actif, vitesse }: { actif: boolean; vitesse: number }) {
+  const { camera, gl } = useThree();
+  const touches = useRef<Record<string, boolean>>({});
+  const yaw = useRef(0);
+  const pitch = useRef(0);
+  const drag = useRef(false);
+  const velocite = useRef(new THREE.Vector3());
+
+  useEffect(() => {
+    const dom = gl.domElement;
+    if (!actif) {
+      touches.current = {};
+      velocite.current.set(0, 0, 0);
+      if (document.pointerLockElement === dom) document.exitPointerLock();
+      dom.style.cursor = "";
+      return;
+    }
+
+    const euler = new THREE.Euler().setFromQuaternion(camera.quaternion, "YXZ");
+    yaw.current = euler.y;
+    pitch.current = euler.x;
+    dom.style.cursor = "crosshair";
+
+    const orienter = (dx: number, dy: number) => {
+      yaw.current -= dx * 0.0022;
+      pitch.current = Math.max(-Math.PI / 2 + 0.05, Math.min(Math.PI / 2 - 0.05, pitch.current - dy * 0.0022));
+    };
+    const onMove = (e: PointerEvent) => {
+      if (document.pointerLockElement === dom) orienter(e.movementX, e.movementY);
+      else if (drag.current) orienter(e.movementX, e.movementY);
+    };
+    const onDown = () => {
+      drag.current = true;
+    };
+    const onUp = () => {
+      drag.current = false;
+    };
+    const onDouble = () => {
+      if (document.pointerLockElement !== dom) dom.requestPointerLock?.();
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      touches.current[e.code] = true;
+      if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) e.preventDefault();
+    };
+    const onKeyUp = (e: KeyboardEvent) => {
+      touches.current[e.code] = false;
+    };
+
+    dom.addEventListener("pointermove", onMove);
+    dom.addEventListener("pointerdown", onDown);
+    window.addEventListener("pointerup", onUp);
+    dom.addEventListener("dblclick", onDouble);
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+    return () => {
+      dom.removeEventListener("pointermove", onMove);
+      dom.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointerup", onUp);
+      dom.removeEventListener("dblclick", onDouble);
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
+      dom.style.cursor = "";
+    };
+  }, [actif, camera, gl]);
+
+  useFrame((_, delta) => {
+    if (!actif) return;
+    camera.quaternion.setFromEuler(new THREE.Euler(pitch.current, yaw.current, 0, "YXZ"));
+
+    const t = touches.current;
+    const avant = (t.KeyW || t.KeyZ || t.ArrowUp ? 1 : 0) - (t.KeyS || t.ArrowDown ? 1 : 0);
+    const cote = (t.KeyD || t.ArrowRight ? 1 : 0) - (t.KeyA || t.KeyQ || t.ArrowLeft ? 1 : 0);
+    const vertical = (t.Space ? 1 : 0) - (t.ShiftLeft || t.ShiftRight || t.KeyC ? 1 : 0);
+    const boost = t.ControlLeft || t.ControlRight ? 2.6 : 1;
+
+    const dir = new THREE.Vector3();
+    const front = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+    const droite = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
+    dir.addScaledVector(front, avant).addScaledVector(droite, cote);
+    dir.y += vertical;
+    if (dir.lengthSq() > 0) dir.normalize();
+
+    const cible = dir.multiplyScalar(vitesse * boost);
+    velocite.current.lerp(cible, Math.min(1, delta * 9));
+    camera.position.addScaledVector(velocite.current, delta);
+  });
+
+  return null;
+}
+
 export default function Plan3DScene({
   simulation,
   peinture,
@@ -664,6 +755,7 @@ export default function Plan3DScene({
   const [etiquettes, setEtiquettes] = useState(true);
   const [ombres, setOmbres] = useState(true);
   const [vue, setVue] = useState("perspective");
+  const [ghost, setGhost] = useState(false);
   const controls = useRef<OrbitControlsImpl | null>(null);
   const lum = ECLAIRAGES[eclairage] ?? ECLAIRAGES.Neutre;
   const rayon = Math.max(14, Math.sqrt(simulation.superficie) * 1.1 + etages * 2);
@@ -728,6 +820,7 @@ export default function Plan3DScene({
           <OrbitControls
             ref={controls}
             makeDefault
+            enabled={!ghost}
             enableDamping
             dampingFactor={0.08}
             rotateSpeed={0.8}
@@ -737,7 +830,8 @@ export default function Plan3DScene({
             maxDistance={rayon * 4}
             maxPolarAngle={Math.PI / 2.02}
           />
-          <Camera vue={vue} rayon={rayon} controls={controls} />
+          {!ghost && <Camera vue={vue} rayon={rayon} controls={controls} />}
+          <GhostControls actif={ghost} vitesse={Math.max(6, rayon * 0.55)} />
         </Suspense>
       </Canvas>
 
@@ -753,7 +847,10 @@ export default function Plan3DScene({
             <button
               key={v.id}
               type="button"
-              onClick={() => setVue(v.id)}
+              onClick={() => {
+                setGhost(false);
+                setVue(v.id);
+              }}
               className={cn(
                 "rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition-colors",
                 vue === v.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
@@ -765,6 +862,13 @@ export default function Plan3DScene({
         </div>
 
         <div className="pointer-events-auto flex flex-wrap items-center gap-1 rounded-xl border border-border bg-background/80 p-1 backdrop-blur">
+          <button
+            type="button"
+            onClick={() => setGhost((g) => !g)}
+            className={cn("rounded-lg px-2.5 py-1.5 text-[11px] font-extrabold", ghost ? "bg-primary text-primary-foreground" : "text-primary")}
+          >
+            Mode ghost
+          </button>
           <button
             type="button"
             onClick={() => setToit((t) => !t)}
@@ -802,7 +906,9 @@ export default function Plan3DScene({
           />
         </label>
         <span>
-          {simulation.superficie} m² · {etages} niveau(x) · glisser = orbite · molette = zoom · clic droit = déplacer
+          {ghost
+            ? "Ghost : glisser (ou double-clic pour verrouiller la souris) = regarder · ZQSD/WASD = avancer · Espace / Maj = monter-descendre · Ctrl = turbo · traverse les murs"
+            : `${simulation.superficie} m² · ${etages} niveau(x) · glisser = orbite · molette = zoom · clic droit = déplacer`}
         </span>
       </div>
     </div>
