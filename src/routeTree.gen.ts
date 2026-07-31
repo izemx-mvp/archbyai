@@ -23,6 +23,7 @@ import { Route as AbonnementsRouteImport } from './routes/abonnements'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as PlanReferenceRouteImport } from './routes/plan.$reference'
+import { Route as AdminAbonnementsRouteImport } from './routes/admin.abonnements'
 import { Route as AdminUtilisateursIndexRouteImport } from './routes/admin.utilisateurs.index'
 import { Route as AdminUtilisateursIdRouteImport } from './routes/admin.utilisateurs.$id'
 
@@ -96,6 +97,11 @@ const PlanReferenceRoute = PlanReferenceRouteImport.update({
   path: '/plan/$reference',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminAbonnementsRoute = AdminAbonnementsRouteImport.update({
+  id: '/abonnements',
+  path: '/abonnements',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminUtilisateursIndexRoute = AdminUtilisateursIndexRouteImport.update({
   id: '/utilisateurs/',
   path: '/utilisateurs/',
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/simulations': typeof SimulationsRoute
   '/tarifs': typeof TarifsRoute
   '/utilisateurs': typeof UtilisateursRoute
+  '/admin/abonnements': typeof AdminAbonnementsRoute
   '/plan/$reference': typeof PlanReferenceRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/utilisateurs/$id': typeof AdminUtilisateursIdRoute
@@ -137,6 +144,7 @@ export interface FileRoutesByTo {
   '/simulations': typeof SimulationsRoute
   '/tarifs': typeof TarifsRoute
   '/utilisateurs': typeof UtilisateursRoute
+  '/admin/abonnements': typeof AdminAbonnementsRoute
   '/plan/$reference': typeof PlanReferenceRoute
   '/admin': typeof AdminIndexRoute
   '/admin/utilisateurs/$id': typeof AdminUtilisateursIdRoute
@@ -156,6 +164,7 @@ export interface FileRoutesById {
   '/simulations': typeof SimulationsRoute
   '/tarifs': typeof TarifsRoute
   '/utilisateurs': typeof UtilisateursRoute
+  '/admin/abonnements': typeof AdminAbonnementsRoute
   '/plan/$reference': typeof PlanReferenceRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/utilisateurs/$id': typeof AdminUtilisateursIdRoute
@@ -176,6 +185,7 @@ export interface FileRouteTypes {
     | '/simulations'
     | '/tarifs'
     | '/utilisateurs'
+    | '/admin/abonnements'
     | '/plan/$reference'
     | '/admin/'
     | '/admin/utilisateurs/$id'
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/simulations'
     | '/tarifs'
     | '/utilisateurs'
+    | '/admin/abonnements'
     | '/plan/$reference'
     | '/admin'
     | '/admin/utilisateurs/$id'
@@ -211,6 +222,7 @@ export interface FileRouteTypes {
     | '/simulations'
     | '/tarifs'
     | '/utilisateurs'
+    | '/admin/abonnements'
     | '/plan/$reference'
     | '/admin/'
     | '/admin/utilisateurs/$id'
@@ -333,6 +345,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlanReferenceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/abonnements': {
+      id: '/admin/abonnements'
+      path: '/abonnements'
+      fullPath: '/admin/abonnements'
+      preLoaderRoute: typeof AdminAbonnementsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/utilisateurs/': {
       id: '/admin/utilisateurs/'
       path: '/utilisateurs'
@@ -351,12 +370,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminAbonnementsRoute: typeof AdminAbonnementsRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminUtilisateursIdRoute: typeof AdminUtilisateursIdRoute
   AdminUtilisateursIndexRoute: typeof AdminUtilisateursIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAbonnementsRoute: AdminAbonnementsRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminUtilisateursIdRoute: AdminUtilisateursIdRoute,
   AdminUtilisateursIndexRoute: AdminUtilisateursIndexRoute,
