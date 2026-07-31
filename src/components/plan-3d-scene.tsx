@@ -811,6 +811,7 @@ export default function Plan3DScene({
   const [etiquettes, setEtiquettes] = useState(true);
   const [ombres, setOmbres] = useState(true);
   const [vue, setVue] = useState("perspective");
+  const [vueTick, setVueTick] = useState(0);
   const [ghost, setGhost] = useState(false);
   const [pleinEcran, setPleinEcran] = useState(false);
   const controls = useRef<OrbitControlsImpl | null>(null);
