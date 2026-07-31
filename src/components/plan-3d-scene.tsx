@@ -968,6 +968,7 @@ export default function Plan3DScene({
               onClick={() => {
                 setGhost(false);
                 setVue(v.id);
+                setVueTick((t) => t + 1);
               }}
               className={cn(
                 "rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition-colors",
