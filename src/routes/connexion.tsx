@@ -112,7 +112,7 @@ const ESPACES: {
     id: "admin",
     titre: "Back-office gestion SaaS",
     sousTitre: "Pilotez la plateforme et la facturation",
-    points: ["Revenus, MRR & churn", "Clients, comptes & abonnements", "API, services & historique"],
+    points: ["Revenus, MRR & churn", "Clients, comptes & abonnements", "Comptes back-office & clients"],
     icone: LayoutDashboard,
     to: "/admin",
   },

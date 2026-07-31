@@ -3,15 +3,11 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   ArrowLeft,
   CreditCard,
-  Cpu,
-  History,
   LayoutDashboard,
   Menu,
   Moon,
-  Plug,
   Receipt,
   Sun,
-  Users,
   UserCog,
 } from "lucide-react";
 
@@ -33,24 +29,13 @@ export const adminNavigation: { titre: string; liens: Lien[] }[] = [
   {
     titre: "Facturation",
     liens: [
-      { to: "/admin/abonnements", label: "Abonnements SaaS", icon: Receipt },
-      { to: "/admin/paiements", label: "Paiements", icon: CreditCard },
+      { to: "/admin/abonnements", label: "Gestion des abonnements", icon: Receipt },
+      { to: "/admin/paiements", label: "Gestion des paiements", icon: CreditCard },
     ],
   },
   {
-    titre: "Clients & comptes",
-    liens: [
-      { to: "/admin/utilisateurs", label: "Clients", icon: UserCog },
-      { to: "/utilisateurs", label: "Comptes plateforme", icon: Users },
-    ],
-  },
-  {
-    titre: "Plateforme",
-    liens: [
-      { to: "/abonnements", label: "Abonnements API", icon: Plug },
-      { to: "/services", label: "Services", icon: Cpu },
-      { to: "/historique", label: "Historique", icon: History },
-    ],
+    titre: "Comptes",
+    liens: [{ to: "/admin/utilisateurs", label: "Gestion des utilisateurs", icon: UserCog }],
   },
 ];
 
