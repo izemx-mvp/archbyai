@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UtilisateursRouteImport } from './routes/utilisateurs'
+import { Route as TarifsRouteImport } from './routes/tarifs'
 import { Route as SimulationsRouteImport } from './routes/simulations'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ParametresRouteImport } from './routes/parametres'
@@ -23,6 +24,11 @@ import { Route as PlanReferenceRouteImport } from './routes/plan.$reference'
 const UtilisateursRoute = UtilisateursRouteImport.update({
   id: '/utilisateurs',
   path: '/utilisateurs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TarifsRoute = TarifsRouteImport.update({
+  id: '/tarifs',
+  path: '/tarifs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SimulationsRoute = SimulationsRouteImport.update({
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/parametres': typeof ParametresRoute
   '/services': typeof ServicesRoute
   '/simulations': typeof SimulationsRoute
+  '/tarifs': typeof TarifsRoute
   '/utilisateurs': typeof UtilisateursRoute
   '/plan/$reference': typeof PlanReferenceRoute
 }
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/parametres': typeof ParametresRoute
   '/services': typeof ServicesRoute
   '/simulations': typeof SimulationsRoute
+  '/tarifs': typeof TarifsRoute
   '/utilisateurs': typeof UtilisateursRoute
   '/plan/$reference': typeof PlanReferenceRoute
 }
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/parametres': typeof ParametresRoute
   '/services': typeof ServicesRoute
   '/simulations': typeof SimulationsRoute
+  '/tarifs': typeof TarifsRoute
   '/utilisateurs': typeof UtilisateursRoute
   '/plan/$reference': typeof PlanReferenceRoute
 }
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/parametres'
     | '/services'
     | '/simulations'
+    | '/tarifs'
     | '/utilisateurs'
     | '/plan/$reference'
   fileRoutesByTo: FileRoutesByTo
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/parametres'
     | '/services'
     | '/simulations'
+    | '/tarifs'
     | '/utilisateurs'
     | '/plan/$reference'
   id:
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/parametres'
     | '/services'
     | '/simulations'
+    | '/tarifs'
     | '/utilisateurs'
     | '/plan/$reference'
   fileRoutesById: FileRoutesById
@@ -156,6 +168,7 @@ export interface RootRouteChildren {
   ParametresRoute: typeof ParametresRoute
   ServicesRoute: typeof ServicesRoute
   SimulationsRoute: typeof SimulationsRoute
+  TarifsRoute: typeof TarifsRoute
   UtilisateursRoute: typeof UtilisateursRoute
   PlanReferenceRoute: typeof PlanReferenceRoute
 }
@@ -167,6 +180,13 @@ declare module '@tanstack/react-router' {
       path: '/utilisateurs'
       fullPath: '/utilisateurs'
       preLoaderRoute: typeof UtilisateursRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tarifs': {
+      id: '/tarifs'
+      path: '/tarifs'
+      fullPath: '/tarifs'
+      preLoaderRoute: typeof TarifsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/simulations': {
@@ -244,6 +264,7 @@ const rootRouteChildren: RootRouteChildren = {
   ParametresRoute: ParametresRoute,
   ServicesRoute: ServicesRoute,
   SimulationsRoute: SimulationsRoute,
+  TarifsRoute: TarifsRoute,
   UtilisateursRoute: UtilisateursRoute,
   PlanReferenceRoute: PlanReferenceRoute,
 }
