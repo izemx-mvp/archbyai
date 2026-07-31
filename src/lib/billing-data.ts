@@ -135,6 +135,8 @@ export const clients: ClientCompte[] = [
   { id: "CLI-012", nom: "Rachid Amrani", email: "r.amrani@medina-dev.ma", societe: "Medina Développement", role: "Architecte", statut: "actif", espace: "client", inscription: "02/06/2026", derniereActivite: "25/07/2026 16:31" },
   { id: "CLI-013", nom: "Sofia Berrada", email: "s.berrada@ville-rabat.ma", societe: "Ville de Rabat", role: "Utilisateur", statut: "actif", espace: "client", inscription: "19/06/2026", derniereActivite: "24/07/2026 10:47" },
   { id: "CLI-014", nom: "Anas Moukhliss", email: "a.moukhliss@atlantic-build.ma", societe: "Atlantic Build", role: "Architecte", statut: "invite", espace: "client", inscription: "07/07/2026", derniereActivite: "—" },
+  { id: "CLI-015", nom: "Yasmine Alaoui", email: "y.alaoui@archbyai.ma", societe: "ArchbyAI", role: "Administrateur", statut: "actif", espace: "back-office", inscription: "15/01/2026", derniereActivite: "30/07/2026 09:12" },
+  { id: "CLI-016", nom: "Mehdi Ouazzani", email: "m.ouazzani@archbyai.ma", societe: "ArchbyAI", role: "Utilisateur", statut: "actif", espace: "back-office", inscription: "03/03/2026", derniereActivite: "29/07/2026 18:40" },
 ];
 
 export const abonnementsClients: AbonnementClient[] = [
