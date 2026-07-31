@@ -623,18 +623,26 @@ function CaptureScene({ cible }: { cible: React.MutableRefObject<THREE.Scene | n
   return null;
 }
 
+/**
+ * Transition douce vers une vue prédéfinie. L'animation s'arrête dès qu'elle est
+ * terminée ou dès que l'utilisateur touche la souris : les contrôles d'orbite,
+ * le zoom et le pavé de navigation ne sont donc jamais « ramenés » de force.
+ */
 function Camera({
   vue,
+  tick,
   rayon,
   controls,
 }: {
   vue: string;
+  tick: number;
   rayon: number;
   controls: React.RefObject<OrbitControlsImpl | null>;
 }) {
   const { camera } = useThree();
   const cible = useRef(new THREE.Vector3(rayon * 1.1, rayon * 0.8, rayon * 1.3));
   const focus = useRef(new THREE.Vector3(0, rayon * 0.25, 0));
+  const anime = useRef(false);
 
   useEffect(() => {
     const presets: Record<string, [THREE.Vector3, THREE.Vector3]> = {
@@ -646,14 +654,35 @@ function Camera({
     const p = presets[vue] ?? presets.perspective;
     cible.current.copy(p[0]);
     focus.current.copy(p[1]);
-  }, [vue, rayon]);
+    anime.current = true;
+  }, [vue, tick, rayon]);
+
+  // Toute interaction souris annule la transition en cours.
+  useEffect(() => {
+    const c = controls.current;
+    if (!c) return;
+    const stop = () => {
+      anime.current = false;
+    };
+    c.addEventListener("start", stop);
+    return () => c.removeEventListener("start", stop);
+  }, [controls]);
 
   useFrame(() => {
-    camera.position.lerp(cible.current, 0.08);
+    if (!anime.current) return;
     const c = controls.current;
+    camera.position.lerp(cible.current, 0.12);
     if (c) {
-      c.target.lerp(focus.current, 0.08);
+      c.target.lerp(focus.current, 0.12);
       c.update();
+    }
+    if (camera.position.distanceTo(cible.current) < rayon * 0.004) {
+      camera.position.copy(cible.current);
+      if (c) {
+        c.target.copy(focus.current);
+        c.update();
+      }
+      anime.current = false;
     }
   });
   return null;
