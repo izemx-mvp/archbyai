@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Box, CheckCircle2, Download, LayoutGrid, Share2, XCircle } from "lucide-react";
+import { Box, CheckCircle2, Download, LayoutGrid, Maximize2, Minimize2, Share2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/app-shell";
@@ -57,6 +57,17 @@ function PlanPage() {
 
   const [etage, setEtage] = useState(0);
   const [plein2d, setPlein2d] = useState(false);
+
+  useEffect(() => {
+    if (!plein2d) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setPlein2d(false);
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [plein2d]);
   const [peinture, setPeinture] = useState(OPTIONS_PEINTURE[0].valeur);
   const [sol, setSol] = useState<string>(OPTIONS_SOL[0]);
   const [eclairage, setEclairage] = useState<string>(OPTIONS_ECLAIRAGE[0]);
