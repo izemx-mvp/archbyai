@@ -18,6 +18,7 @@ import { Route as NouvelleSimulationRouteImport } from './routes/nouvelle-simula
 import { Route as MonAbonnementRouteImport } from './routes/mon-abonnement'
 import { Route as HistoriqueRouteImport } from './routes/historique'
 import { Route as ConnexionRouteImport } from './routes/connexion'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AbonnementsRouteImport } from './routes/abonnements'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlanReferenceRouteImport } from './routes/plan.$reference'
@@ -67,6 +68,11 @@ const ConnexionRoute = ConnexionRouteImport.update({
   path: '/connexion',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AbonnementsRoute = AbonnementsRouteImport.update({
   id: '/abonnements',
   path: '/abonnements',
@@ -86,6 +92,7 @@ const PlanReferenceRoute = PlanReferenceRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/abonnements': typeof AbonnementsRoute
+  '/admin': typeof AdminRoute
   '/connexion': typeof ConnexionRoute
   '/historique': typeof HistoriqueRoute
   '/mon-abonnement': typeof MonAbonnementRoute
@@ -100,6 +107,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/abonnements': typeof AbonnementsRoute
+  '/admin': typeof AdminRoute
   '/connexion': typeof ConnexionRoute
   '/historique': typeof HistoriqueRoute
   '/mon-abonnement': typeof MonAbonnementRoute
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/abonnements': typeof AbonnementsRoute
+  '/admin': typeof AdminRoute
   '/connexion': typeof ConnexionRoute
   '/historique': typeof HistoriqueRoute
   '/mon-abonnement': typeof MonAbonnementRoute
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/abonnements'
+    | '/admin'
     | '/connexion'
     | '/historique'
     | '/mon-abonnement'
@@ -145,6 +155,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/abonnements'
+    | '/admin'
     | '/connexion'
     | '/historique'
     | '/mon-abonnement'
@@ -159,6 +170,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/abonnements'
+    | '/admin'
     | '/connexion'
     | '/historique'
     | '/mon-abonnement'
@@ -174,6 +186,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AbonnementsRoute: typeof AbonnementsRoute
+  AdminRoute: typeof AdminRoute
   ConnexionRoute: typeof ConnexionRoute
   HistoriqueRoute: typeof HistoriqueRoute
   MonAbonnementRoute: typeof MonAbonnementRoute
@@ -251,6 +264,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnexionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/abonnements': {
       id: '/abonnements'
       path: '/abonnements'
@@ -278,6 +298,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AbonnementsRoute: AbonnementsRoute,
+  AdminRoute: AdminRoute,
   ConnexionRoute: ConnexionRoute,
   HistoriqueRoute: HistoriqueRoute,
   MonAbonnementRoute: MonAbonnementRoute,
