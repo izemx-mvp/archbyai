@@ -94,7 +94,7 @@ function Arbre({ position, palmier }: { position: [number, number, number]; palm
     <group position={position}>
       <mesh castShadow position={[0, palmier ? 2.4 : 1.1, 0]}>
         <cylinderGeometry args={[palmier ? 0.16 : 0.22, palmier ? 0.22 : 0.3, palmier ? 4.8 : 2.2, 8]} />
-        <meshStandardMaterial color={palmier ? "#9b7b४f".replace("४", "4") : "#6b4b32"} roughness={1} />
+        <meshStandardMaterial color={palmier ? "#9b7b4f" : "#6b4b32"} roughness={1} />
       </mesh>
       {palmier ? (
         Array.from({ length: 7 }).map((_, i) => (
@@ -529,6 +529,7 @@ function Batiment({
   etiquettes: boolean;
 }) {
   const textureSol = useTextureSol(sol);
+  const styleCfg = STYLES[sim.style ?? "Moderne"] ?? STYLES.Moderne;
   const lum = ECLAIRAGES[eclairage] ?? ECLAIRAGES.Neutre;
   const etages = Math.max(1, Math.min(8, sim.etages));
   const surfaceEtage = Math.max(40, sim.superficie / etages);
@@ -544,15 +545,10 @@ function Batiment({
       {/* terrain */}
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
         <planeGeometry args={[largeur * 2.4, profondeur * 2.6]} />
-        <meshStandardMaterial color={sim.type === "Villa" ? "#7fa96a" : "#c9c5bc"} roughness={1} />
+        <meshStandardMaterial color={styleCfg.sol} roughness={1} />
       </mesh>
 
-      {sim.type === "Villa" && sim.piscine && (
-        <mesh receiveShadow position={[largeur * 0.75, -0.1, profondeur * 0.6]}>
-          <boxGeometry args={[largeur * 0.45, 0.4, profondeur * 0.35]} />
-          <meshPhysicalMaterial color="#2fa8cf" roughness={0.08} transmission={0.5} thickness={1} transparent opacity={0.9} />
-        </mesh>
-      )}
+      <Exterieurs sim={sim} largeur={largeur} profondeur={profondeur} style={styleCfg} hauteurTotale={etages * HAUTEUR_ETAGE} />
 
       {sim.sousSol && (
         <mesh position={[0, -HAUTEUR_ETAGE / 2, 0]}>
@@ -580,12 +576,35 @@ function Batiment({
         <group position={[0, etages * HAUTEUR_ETAGE + 0.1, 0]}>
           <mesh castShadow receiveShadow>
             <boxGeometry args={[largeur + 0.6, 0.22, profondeur + 0.6]} />
-            <meshStandardMaterial color="#8d8b86" roughness={0.95} />
+            <meshStandardMaterial color={styleCfg.toit} roughness={0.95} />
           </mesh>
-          <mesh castShadow position={[0, 0.35, 0]}>
-            <boxGeometry args={[largeur + 0.6, 0.5, 0.18]} />
-            <meshStandardMaterial color={peinture} roughness={0.9} />
-          </mesh>
+
+          {(sim.toiture ?? "Plate") === "Tuiles" ? (
+            <mesh castShadow position={[0, (Math.min(largeur, profondeur) * 0.28) / 2 + 0.2, 0]} rotation={[0, Math.PI / 4, 0]}>
+              <coneGeometry args={[Math.max(largeur, profondeur) * 0.72, Math.min(largeur, profondeur) * 0.28, 4]} />
+              <meshStandardMaterial color="#a8492c" roughness={0.85} />
+            </mesh>
+          ) : (
+            <>
+              {[
+                { p: [0, 0.55, (profondeur + 0.6) / 2] as [number, number, number], a: [largeur + 0.6, 0.9, 0.18] as [number, number, number] },
+                { p: [0, 0.55, -(profondeur + 0.6) / 2] as [number, number, number], a: [largeur + 0.6, 0.9, 0.18] as [number, number, number] },
+                { p: [(largeur + 0.6) / 2, 0.55, 0] as [number, number, number], a: [0.18, 0.9, profondeur + 0.6] as [number, number, number] },
+                { p: [-(largeur + 0.6) / 2, 0.55, 0] as [number, number, number], a: [0.18, 0.9, profondeur + 0.6] as [number, number, number] },
+              ].map((m, i) => (
+                <mesh key={i} castShadow position={m.p}>
+                  <boxGeometry args={m.a} />
+                  <meshStandardMaterial color={peinture} roughness={0.9} />
+                </mesh>
+              ))}
+              {(sim.toiture ?? "Plate") === "Terrasse accessible" && (
+                <mesh receiveShadow position={[0, 0.18, 0]}>
+                  <boxGeometry args={[largeur, 0.06, profondeur]} />
+                  <meshStandardMaterial color="#cbb193" roughness={0.9} />
+                </mesh>
+              )}
+            </>
+          )}
         </group>
       )}
     </group>
