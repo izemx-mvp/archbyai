@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Mail, Pencil, Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
-import { AppShell } from "@/components/app-shell";
+import { AdminShell } from "@/components/admin-shell";
 import { DataTable, type Column } from "@/components/data-table";
 import { PageHeader } from "@/components/page-parts";
 import { StatusPill, type Tone } from "@/components/status-pill";
@@ -179,7 +179,7 @@ function UtilisateursPage() {
   ];
 
   return (
-    <AppShell>
+    <AdminShell>
       <PageHeader
         titre="Utilisateurs"
         description="Configurez les accès à la plateforme et les rôles de chaque intervenant."
@@ -334,6 +334,6 @@ function UtilisateursPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </AppShell>
+    </AdminShell>
   );
 }
