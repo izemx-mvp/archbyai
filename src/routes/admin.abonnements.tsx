@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BadgePercent, CalendarPlus, Eye, RefreshCw, XCircle } from "lucide-react";
+import { BadgePercent, CalendarPlus, Eye, Pencil, Plus, RefreshCw, Trash2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { DataTable, type Column } from "@/components/data-table";
@@ -36,7 +36,22 @@ import {
   type AbonnementClient,
   type PlanId,
   type Periodicite,
+  type StatutAbonnement,
 } from "@/lib/billing-data";
+
+/** Formulaire vide pour la création d'un abonnement. */
+const formulaireVide = {
+  client: "",
+  email: "",
+  clientId: "",
+  plan: "pro" as PlanId,
+  periodicite: "mensuel" as Periodicite,
+  statut: "actif" as StatutAbonnement,
+  debut: new Intl.DateTimeFormat("fr-FR").format(new Date()),
+  renouvellement: new Intl.DateTimeFormat("fr-FR").format(new Date(Date.now() + 30 * 86400000)),
+  montant: planParId("pro").prixMensuel,
+};
+type Formulaire = typeof formulaireVide;
 
 export const Route = createFileRoute("/admin/abonnements")({
   head: () => ({
@@ -58,7 +73,49 @@ const statutMap: Record<AbonnementClient["statut"], { label: string; tone: Tone 
 };
 
 function AdminAbonnements() {
-  const { state, ready, changerPlan, changerStatutAbonnement, appliquerRemise, prolongerEssai } = useBilling();
+  const { state, ready, changerPlan, changerStatutAbonnement, appliquerRemise, prolongerEssai, creerAbonnement, majAbonnement, supprimerAbonnement } =
+    useBilling();
+  const [formOpen, setFormOpen] = useState(false);
+  const [edition, setEdition] = useState<AbonnementClient | null>(null);
+  const [form, setForm] = useState<Formulaire>(formulaireVide);
+  const [suppression, setSuppression] = useState<AbonnementClient | null>(null);
+
+  const ouvrirCreation = () => {
+    setEdition(null);
+    setForm(formulaireVide);
+    setFormOpen(true);
+  };
+
+  const ouvrirEdition = (a: AbonnementClient) => {
+    setEdition(a);
+    setForm({
+      client: a.client,
+      email: a.email,
+      clientId: a.clientId,
+      plan: a.plan,
+      periodicite: a.periodicite,
+      statut: a.statut,
+      debut: a.debut,
+      renouvellement: a.renouvellement,
+      montant: a.montant,
+    });
+    setFormOpen(true);
+  };
+
+  const enregistrer = () => {
+    if (!form.client.trim() || !form.email.trim()) {
+      toast.error("Le nom du client et l'e-mail sont obligatoires.");
+      return;
+    }
+    if (edition) {
+      majAbonnement(edition.id, { ...form });
+      toast.success(`Abonnement ${edition.id} mis à jour.`);
+    } else {
+      const cree = creerAbonnement({ ...form, clientId: form.clientId || "CLI-000" });
+      toast.success(`Abonnement ${cree.id} créé pour ${cree.client}.`);
+    }
+    setFormOpen(false);
+  };
   const [detail, setDetail] = useState<AbonnementClient | null>(null);
   const [planDialog, setPlanDialog] = useState<AbonnementClient | null>(null);
   const [remiseDialog, setRemiseDialog] = useState<AbonnementClient | null>(null);
@@ -94,6 +151,12 @@ function AdminAbonnements() {
           <Button variant="ghost" size="icon-sm" aria-label="Détail de l'abonnement" onClick={() => setDetail(r)}>
             <Eye className="h-4 w-4" />
           </Button>
+          <Button variant="ghost" size="icon-sm" aria-label="Modifier l'abonnement" onClick={() => ouvrirEdition(r)}>
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon-sm" aria-label="Supprimer l'abonnement" onClick={() => setSuppression(r)}>
+            <Trash2 className="h-4 w-4 text-destructive" />
+          </Button>
           <Button variant="ghost" size="icon-sm" aria-label="Changer de plan" onClick={() => { setChoix({ plan: r.plan, periodicite: r.periodicite }); setPlanDialog(r); }}>
             <RefreshCw className="h-4 w-4" />
           </Button>
@@ -116,6 +179,11 @@ function AdminAbonnements() {
       <PageHeader
         titre="Abonnements"
         description={`${state.abonnements.filter((a) => a.statut === "actif").length} abonnements actifs sur ${state.abonnements.length}.`}
+        actions={
+          <Button variant="hero" onClick={ouvrirCreation}>
+            <Plus className="h-4 w-4" /> Nouvel abonnement
+          </Button>
+        }
       />
 
       <DataTable
@@ -264,6 +332,110 @@ function AdminAbonnements() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Création / modification */}
+      <Dialog open={formOpen} onOpenChange={setFormOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{edition ? `Modifier l'abonnement ${edition.id}` : "Nouvel abonnement"}</DialogTitle>
+            <DialogDescription>
+              {edition ? "Mettez à jour les informations de l'abonnement." : "Créez un abonnement pour un client de la plateforme."}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="ab-client">Client</Label>
+              <Input id="ab-client" value={form.client} onChange={(e) => setForm({ ...form, client: e.target.value })} placeholder="Atlas Immobilier" />
+            </div>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="ab-email">E-mail de facturation</Label>
+              <Input id="ab-email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="contact@societe.ma" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Plan</Label>
+              <Select
+                value={form.plan}
+                onValueChange={(v) => {
+                  const p = planParId(v as PlanId);
+                  setForm({ ...form, plan: v as PlanId, montant: form.periodicite === "mensuel" ? p.prixMensuel : p.prixAnnuel });
+                }}
+              >
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{plans.map((p) => <SelectItem key={p.id} value={p.id}>{p.nom}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Cycle</Label>
+              <Select
+                value={form.periodicite}
+                onValueChange={(v) => {
+                  const p = planParId(form.plan);
+                  setForm({ ...form, periodicite: v as Periodicite, montant: v === "mensuel" ? p.prixMensuel : p.prixAnnuel });
+                }}
+              >
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mensuel">Mensuel</SelectItem>
+                  <SelectItem value="annuel">Annuel</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Statut</Label>
+              <Select value={form.statut} onValueChange={(v) => setForm({ ...form, statut: v as StatutAbonnement })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="actif">Actif</SelectItem>
+                  <SelectItem value="essai">Essai</SelectItem>
+                  <SelectItem value="annule">Résilié</SelectItem>
+                  <SelectItem value="expire">Expiré</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="ab-montant">Montant (MAD)</Label>
+              <Input id="ab-montant" inputMode="numeric" value={String(form.montant)} onChange={(e) => setForm({ ...form, montant: Number(e.target.value) || 0 })} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="ab-debut">Début</Label>
+              <Input id="ab-debut" value={form.debut} onChange={(e) => setForm({ ...form, debut: e.target.value })} placeholder="JJ/MM/AAAA" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="ab-renouv">Renouvellement</Label>
+              <Input id="ab-renouv" value={form.renouvellement} onChange={(e) => setForm({ ...form, renouvellement: e.target.value })} placeholder="JJ/MM/AAAA" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setFormOpen(false)}>Annuler</Button>
+            <Button variant="hero" onClick={enregistrer}>{edition ? "Enregistrer" : "Créer l'abonnement"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Suppression */}
+      <AlertDialog open={!!suppression} onOpenChange={(o) => !o && setSuppression(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer l'abonnement {suppression?.id} ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              L'abonnement de {suppression?.client} sera définitivement retiré de la plateforme. Action irréversible.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (suppression) supprimerAbonnement(suppression.id);
+                toast.success("Abonnement supprimé.");
+                setSuppression(null);
+              }}
+            >
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Résiliation */}
       <AlertDialog open={!!annulation} onOpenChange={(o) => !o && setAnnulation(null)}>

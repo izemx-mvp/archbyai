@@ -43,13 +43,13 @@ type State = {
 
 const STORAGE_KEY = "archbyai-data-v2";
 
-const seedNotifications: Notification[] = activitesSeed.map((a, i) => ({
+const seedNotifications: Notification[] = activitesSeed.map((a) => ({
   id: `NTF-${a.id}`,
   titre: a.titre,
   detail: a.detail,
   temps: a.temps,
   type: a.type,
-  to: ["/simulations", "/abonnements", "/services", "/abonnements", "/utilisateurs"][i] ?? "/",
+  to: "/simulations",
   lue: false,
 }));
 
