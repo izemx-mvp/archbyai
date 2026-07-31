@@ -48,11 +48,15 @@ type Ctx = {
   state: BillingState;
   ready: boolean;
   // abonnements
+  creerAbonnement: (input: Omit<AbonnementClient, "id">) => AbonnementClient;
+  majAbonnement: (id: string, patch: Partial<AbonnementClient>) => void;
+  supprimerAbonnement: (id: string) => void;
   changerPlan: (id: string, plan: PlanId, periodicite: Periodicite, montant: number) => void;
   changerStatutAbonnement: (id: string, statut: StatutAbonnement) => void;
   appliquerRemise: (id: string, remise: number) => void;
   prolongerEssai: (id: string, jours: number) => void;
   // clients
+  creerClient: (input: Omit<ClientCompte, "id">) => ClientCompte;
   majClient: (id: string, patch: Partial<ClientCompte>) => void;
   supprimerClient: (id: string) => void;
   // paiements
@@ -102,6 +106,15 @@ export function BillingProvider({ children }: { children: ReactNode }) {
     () => ({
       state,
       ready,
+      creerAbonnement: (input) => {
+        const cree: AbonnementClient = { ...input, id: `SUB-${Math.floor(5000 + Math.random() * 4000)}` };
+        setState((s) => ({ ...s, abonnements: [cree, ...s.abonnements] }));
+        return cree;
+      },
+      majAbonnement: (id, patch) =>
+        setState((s) => ({ ...s, abonnements: patchList(s.abonnements, id, patch) })),
+      supprimerAbonnement: (id) =>
+        setState((s) => ({ ...s, abonnements: s.abonnements.filter((a) => a.id !== id) })),
       changerPlan,
       changerStatutAbonnement: (id, statut) =>
         setState((s) => ({ ...s, abonnements: patchList(s.abonnements, id, { statut }) })),
@@ -112,6 +125,11 @@ export function BillingProvider({ children }: { children: ReactNode }) {
           ...s,
           abonnements: patchList(s.abonnements, id, { statut: "essai", renouvellement: dansNJours(jours) }),
         })),
+      creerClient: (input) => {
+        const cree: ClientCompte = { ...input, id: `CLI-${Math.floor(100 + Math.random() * 899)}` };
+        setState((s) => ({ ...s, clients: [cree, ...s.clients] }));
+        return cree;
+      },
       majClient: (id, patch) => setState((s) => ({ ...s, clients: patchList(s.clients, id, patch) })),
       supprimerClient: (id) =>
         setState((s) => ({
