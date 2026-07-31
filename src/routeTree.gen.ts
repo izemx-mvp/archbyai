@@ -10,19 +10,32 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UtilisateursRouteImport } from './routes/utilisateurs'
+import { Route as TarifsRouteImport } from './routes/tarifs'
 import { Route as SimulationsRouteImport } from './routes/simulations'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ParametresRouteImport } from './routes/parametres'
 import { Route as NouvelleSimulationRouteImport } from './routes/nouvelle-simulation'
+import { Route as MonAbonnementRouteImport } from './routes/mon-abonnement'
 import { Route as HistoriqueRouteImport } from './routes/historique'
 import { Route as ConnexionRouteImport } from './routes/connexion'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AbonnementsRouteImport } from './routes/abonnements'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as PlanReferenceRouteImport } from './routes/plan.$reference'
+import { Route as AdminPaiementsRouteImport } from './routes/admin.paiements'
+import { Route as AdminAbonnementsRouteImport } from './routes/admin.abonnements'
+import { Route as AdminUtilisateursIndexRouteImport } from './routes/admin.utilisateurs.index'
+import { Route as AdminUtilisateursIdRouteImport } from './routes/admin.utilisateurs.$id'
 
 const UtilisateursRoute = UtilisateursRouteImport.update({
   id: '/utilisateurs',
   path: '/utilisateurs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TarifsRoute = TarifsRouteImport.update({
+  id: '/tarifs',
+  path: '/tarifs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SimulationsRoute = SimulationsRouteImport.update({
@@ -45,6 +58,11 @@ const NouvelleSimulationRoute = NouvelleSimulationRouteImport.update({
   path: '/nouvelle-simulation',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MonAbonnementRoute = MonAbonnementRouteImport.update({
+  id: '/mon-abonnement',
+  path: '/mon-abonnement',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HistoriqueRoute = HistoriqueRouteImport.update({
   id: '/historique',
   path: '/historique',
@@ -53,6 +71,11 @@ const HistoriqueRoute = HistoriqueRouteImport.update({
 const ConnexionRoute = ConnexionRouteImport.update({
   id: '/connexion',
   path: '/connexion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AbonnementsRoute = AbonnementsRouteImport.update({
@@ -65,97 +88,171 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const PlanReferenceRoute = PlanReferenceRouteImport.update({
   id: '/plan/$reference',
   path: '/plan/$reference',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminPaiementsRoute = AdminPaiementsRouteImport.update({
+  id: '/paiements',
+  path: '/paiements',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAbonnementsRoute = AdminAbonnementsRouteImport.update({
+  id: '/abonnements',
+  path: '/abonnements',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUtilisateursIndexRoute = AdminUtilisateursIndexRouteImport.update({
+  id: '/utilisateurs/',
+  path: '/utilisateurs/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUtilisateursIdRoute = AdminUtilisateursIdRouteImport.update({
+  id: '/utilisateurs/$id',
+  path: '/utilisateurs/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/abonnements': typeof AbonnementsRoute
+  '/admin': typeof AdminRouteWithChildren
   '/connexion': typeof ConnexionRoute
   '/historique': typeof HistoriqueRoute
+  '/mon-abonnement': typeof MonAbonnementRoute
   '/nouvelle-simulation': typeof NouvelleSimulationRoute
   '/parametres': typeof ParametresRoute
   '/services': typeof ServicesRoute
   '/simulations': typeof SimulationsRoute
+  '/tarifs': typeof TarifsRoute
   '/utilisateurs': typeof UtilisateursRoute
+  '/admin/abonnements': typeof AdminAbonnementsRoute
+  '/admin/paiements': typeof AdminPaiementsRoute
   '/plan/$reference': typeof PlanReferenceRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/utilisateurs/$id': typeof AdminUtilisateursIdRoute
+  '/admin/utilisateurs/': typeof AdminUtilisateursIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/abonnements': typeof AbonnementsRoute
   '/connexion': typeof ConnexionRoute
   '/historique': typeof HistoriqueRoute
+  '/mon-abonnement': typeof MonAbonnementRoute
   '/nouvelle-simulation': typeof NouvelleSimulationRoute
   '/parametres': typeof ParametresRoute
   '/services': typeof ServicesRoute
   '/simulations': typeof SimulationsRoute
+  '/tarifs': typeof TarifsRoute
   '/utilisateurs': typeof UtilisateursRoute
+  '/admin/abonnements': typeof AdminAbonnementsRoute
+  '/admin/paiements': typeof AdminPaiementsRoute
   '/plan/$reference': typeof PlanReferenceRoute
+  '/admin': typeof AdminIndexRoute
+  '/admin/utilisateurs/$id': typeof AdminUtilisateursIdRoute
+  '/admin/utilisateurs': typeof AdminUtilisateursIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/abonnements': typeof AbonnementsRoute
+  '/admin': typeof AdminRouteWithChildren
   '/connexion': typeof ConnexionRoute
   '/historique': typeof HistoriqueRoute
+  '/mon-abonnement': typeof MonAbonnementRoute
   '/nouvelle-simulation': typeof NouvelleSimulationRoute
   '/parametres': typeof ParametresRoute
   '/services': typeof ServicesRoute
   '/simulations': typeof SimulationsRoute
+  '/tarifs': typeof TarifsRoute
   '/utilisateurs': typeof UtilisateursRoute
+  '/admin/abonnements': typeof AdminAbonnementsRoute
+  '/admin/paiements': typeof AdminPaiementsRoute
   '/plan/$reference': typeof PlanReferenceRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/utilisateurs/$id': typeof AdminUtilisateursIdRoute
+  '/admin/utilisateurs/': typeof AdminUtilisateursIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/abonnements'
+    | '/admin'
     | '/connexion'
     | '/historique'
+    | '/mon-abonnement'
     | '/nouvelle-simulation'
     | '/parametres'
     | '/services'
     | '/simulations'
+    | '/tarifs'
     | '/utilisateurs'
+    | '/admin/abonnements'
+    | '/admin/paiements'
     | '/plan/$reference'
+    | '/admin/'
+    | '/admin/utilisateurs/$id'
+    | '/admin/utilisateurs/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/abonnements'
     | '/connexion'
     | '/historique'
+    | '/mon-abonnement'
     | '/nouvelle-simulation'
     | '/parametres'
     | '/services'
     | '/simulations'
+    | '/tarifs'
     | '/utilisateurs'
+    | '/admin/abonnements'
+    | '/admin/paiements'
     | '/plan/$reference'
+    | '/admin'
+    | '/admin/utilisateurs/$id'
+    | '/admin/utilisateurs'
   id:
     | '__root__'
     | '/'
     | '/abonnements'
+    | '/admin'
     | '/connexion'
     | '/historique'
+    | '/mon-abonnement'
     | '/nouvelle-simulation'
     | '/parametres'
     | '/services'
     | '/simulations'
+    | '/tarifs'
     | '/utilisateurs'
+    | '/admin/abonnements'
+    | '/admin/paiements'
     | '/plan/$reference'
+    | '/admin/'
+    | '/admin/utilisateurs/$id'
+    | '/admin/utilisateurs/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AbonnementsRoute: typeof AbonnementsRoute
+  AdminRoute: typeof AdminRouteWithChildren
   ConnexionRoute: typeof ConnexionRoute
   HistoriqueRoute: typeof HistoriqueRoute
+  MonAbonnementRoute: typeof MonAbonnementRoute
   NouvelleSimulationRoute: typeof NouvelleSimulationRoute
   ParametresRoute: typeof ParametresRoute
   ServicesRoute: typeof ServicesRoute
   SimulationsRoute: typeof SimulationsRoute
+  TarifsRoute: typeof TarifsRoute
   UtilisateursRoute: typeof UtilisateursRoute
   PlanReferenceRoute: typeof PlanReferenceRoute
 }
@@ -167,6 +264,13 @@ declare module '@tanstack/react-router' {
       path: '/utilisateurs'
       fullPath: '/utilisateurs'
       preLoaderRoute: typeof UtilisateursRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tarifs': {
+      id: '/tarifs'
+      path: '/tarifs'
+      fullPath: '/tarifs'
+      preLoaderRoute: typeof TarifsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/simulations': {
@@ -197,6 +301,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NouvelleSimulationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mon-abonnement': {
+      id: '/mon-abonnement'
+      path: '/mon-abonnement'
+      fullPath: '/mon-abonnement'
+      preLoaderRoute: typeof MonAbonnementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/historique': {
       id: '/historique'
       path: '/historique'
@@ -209,6 +320,13 @@ declare module '@tanstack/react-router' {
       path: '/connexion'
       fullPath: '/connexion'
       preLoaderRoute: typeof ConnexionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/abonnements': {
@@ -225,6 +343,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/plan/$reference': {
       id: '/plan/$reference'
       path: '/plan/$reference'
@@ -232,18 +357,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlanReferenceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/paiements': {
+      id: '/admin/paiements'
+      path: '/paiements'
+      fullPath: '/admin/paiements'
+      preLoaderRoute: typeof AdminPaiementsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/abonnements': {
+      id: '/admin/abonnements'
+      path: '/abonnements'
+      fullPath: '/admin/abonnements'
+      preLoaderRoute: typeof AdminAbonnementsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/utilisateurs/': {
+      id: '/admin/utilisateurs/'
+      path: '/utilisateurs'
+      fullPath: '/admin/utilisateurs/'
+      preLoaderRoute: typeof AdminUtilisateursIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/utilisateurs/$id': {
+      id: '/admin/utilisateurs/$id'
+      path: '/utilisateurs/$id'
+      fullPath: '/admin/utilisateurs/$id'
+      preLoaderRoute: typeof AdminUtilisateursIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminAbonnementsRoute: typeof AdminAbonnementsRoute
+  AdminPaiementsRoute: typeof AdminPaiementsRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminUtilisateursIdRoute: typeof AdminUtilisateursIdRoute
+  AdminUtilisateursIndexRoute: typeof AdminUtilisateursIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAbonnementsRoute: AdminAbonnementsRoute,
+  AdminPaiementsRoute: AdminPaiementsRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  AdminUtilisateursIdRoute: AdminUtilisateursIdRoute,
+  AdminUtilisateursIndexRoute: AdminUtilisateursIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AbonnementsRoute: AbonnementsRoute,
+  AdminRoute: AdminRouteWithChildren,
   ConnexionRoute: ConnexionRoute,
   HistoriqueRoute: HistoriqueRoute,
+  MonAbonnementRoute: MonAbonnementRoute,
   NouvelleSimulationRoute: NouvelleSimulationRoute,
   ParametresRoute: ParametresRoute,
   ServicesRoute: ServicesRoute,
   SimulationsRoute: SimulationsRoute,
+  TarifsRoute: TarifsRoute,
   UtilisateursRoute: UtilisateursRoute,
   PlanReferenceRoute: PlanReferenceRoute,
 }

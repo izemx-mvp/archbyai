@@ -15,6 +15,7 @@ import { ThemeProvider, themeInitScript } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { DataProvider } from "@/lib/store";
+import { BillingProvider } from "@/lib/billing-store";
 
 function NotFoundComponent() {
   return (
@@ -130,9 +131,11 @@ function RootComponent() {
       <ThemeProvider>
         <TooltipProvider delayDuration={150}>
           <DataProvider>
-            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-            <Outlet />
-            <Toaster position="top-right" richColors closeButton />
+            <BillingProvider>
+              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+              <Outlet />
+              <Toaster position="top-right" richColors closeButton />
+            </BillingProvider>
           </DataProvider>
         </TooltipProvider>
       </ThemeProvider>
