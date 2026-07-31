@@ -847,6 +847,8 @@ export default function Plan3DScene({
     const c = controls.current;
     if (!c) return;
     setGhost(false);
+    // Annule une éventuelle transition de vue en cours pour ne pas la subir.
+    c.dispatchEvent({ type: "start" } as never);
     const cam = c.object as THREE.PerspectiveCamera;
     const offset = cam.position.clone().sub(c.target);
     const sph = new THREE.Spherical().setFromVector3(offset);
