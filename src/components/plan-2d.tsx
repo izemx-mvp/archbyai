@@ -318,8 +318,28 @@ export function Plan2D({ simulation, etage }: { simulation: Simulation; etage: n
         </text>
       </svg>
 
-      <div className="pointer-events-none absolute right-3 top-3 rounded-lg border border-border bg-card/80 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground backdrop-blur-sm">
-        Zoom {Math.round(vue.z * 100)}%
+      <div className="pointer-events-none absolute right-3 top-3 flex items-center gap-2">
+        <div className="pointer-events-auto flex items-center gap-1 rounded-lg border border-border bg-card/85 p-1 backdrop-blur-sm">
+          <button
+            type="button"
+            onClick={() => svgRef.current && exporterSVG(svgRef.current, `plan-2d-${simulation.reference}-niveau-${etage}`)}
+            title="Exporter en SVG (Adobe Illustrator)"
+            className="flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+          >
+            <FileDown className="h-3.5 w-3.5" /> SVG
+          </button>
+          <button
+            type="button"
+            onClick={() => svgRef.current && exporterPNG(svgRef.current, `plan-2d-${simulation.reference}-niveau-${etage}`)}
+            title="Exporter en PNG haute définition (Adobe Photoshop)"
+            className="flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+          >
+            <ImageDown className="h-3.5 w-3.5" /> PNG
+          </button>
+        </div>
+        <div className="rounded-lg border border-border bg-card/80 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground backdrop-blur-sm">
+          Zoom {Math.round(vue.z * 100)}%
+        </div>
       </div>
     </div>
   );
