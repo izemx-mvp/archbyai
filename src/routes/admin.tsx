@@ -10,14 +10,12 @@ export const Route = createFileRoute("/admin")({
   component: AdminLayout,
 });
 
-type Lien = { to: string; label: string; icon: typeof Users; exact?: boolean };
-
-const liens: Lien[] = [
+const liens = [
   { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, exact: true },
   { to: "/admin/utilisateurs", label: "Utilisateurs", icon: Users },
   { to: "/admin/abonnements", label: "Abonnements", icon: Receipt },
   { to: "/admin/paiements", label: "Paiements", icon: CreditCard },
-];
+] as const;
 
 function AdminLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -37,7 +35,7 @@ function AdminLayout() {
           </div>
           <nav className="flex-1 space-y-1 p-3">
             {liens.map((l) => {
-              const active = l.exact ? pathname === l.to : pathname.startsWith(l.to);
+              const active = "exact" in l ? pathname === l.to : pathname.startsWith(l.to);
               return (
                 <Link
                   key={l.to}
@@ -68,7 +66,7 @@ function AdminLayout() {
         <div className="min-w-0 flex-1">
           <div className="sticky top-0 z-30 flex items-center gap-2 overflow-x-auto border-b border-border bg-card/70 px-3 py-2 backdrop-blur-xl md:hidden">
             {liens.map((l) => {
-              const active = l.exact ? pathname === l.to : pathname.startsWith(l.to);
+              const active = "exact" in l ? pathname === l.to : pathname.startsWith(l.to);
               return (
                 <Link
                   key={l.to}
