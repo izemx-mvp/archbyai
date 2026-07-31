@@ -10,19 +10,21 @@ export const Route = createFileRoute("/admin")({
   component: AdminLayout,
 });
 
-const liens = [
+type Lien = { to: string; label: string; icon: typeof Users; exact?: boolean };
+
+const liens: Lien[] = [
   { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, exact: true },
   { to: "/admin/utilisateurs", label: "Utilisateurs", icon: Users },
   { to: "/admin/abonnements", label: "Abonnements", icon: Receipt },
   { to: "/admin/paiements", label: "Paiements", icon: CreditCard },
-] as const;
+];
 
 function AdminLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
     <div className="relative min-h-svh bg-background text-foreground">
-      <AuroraBackground intensity="soft" />
+      <AuroraBackground intensity="subtle" />
       <div className="relative flex min-h-svh">
         <aside className="sticky top-0 hidden h-svh w-60 shrink-0 flex-col border-r border-border bg-card/70 backdrop-blur-xl md:flex">
           <div className="flex h-16 items-center px-4">
