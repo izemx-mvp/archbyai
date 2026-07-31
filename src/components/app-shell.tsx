@@ -46,15 +46,11 @@ import { useData } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 const navigation = [
-  { to: "/", label: "Tableau de bord", icon: LayoutDashboard },
-  { to: "/abonnements", label: "Abonnements API", icon: Plug },
-  { to: "/services", label: "Services", icon: Cpu },
-  { to: "/historique", label: "Historique", icon: History },
-  { to: "/simulations", label: "Simulations", icon: Building2 },
-  { to: "/utilisateurs", label: "Utilisateurs", icon: Users },
+  { to: "/", label: "Accueil", icon: LayoutDashboard },
+  { to: "/nouvelle-simulation", label: "Créer un design IA", icon: Sparkles },
+  { to: "/simulations", label: "Mes simulations", icon: Building2 },
   { to: "/tarifs", label: "Tarifs", icon: CreditCard },
   { to: "/mon-abonnement", label: "Mon abonnement", icon: Receipt },
-  { to: "/admin", label: "Back-office", icon: ShieldCheck },
   { to: "/parametres", label: "Paramètres", icon: Settings },
 ] as const;
 
@@ -353,10 +349,7 @@ function GlobalSearch({ id }: { id?: string }) {
 
   const index = useMemo(
     () => [
-      ...state.apis.map((a) => ({ id: a.id, label: a.nom, meta: `${a.client} · ${a.plan}`, to: "/abonnements" as const })),
-      ...state.services.map((s) => ({ id: s.id, label: s.nom, meta: s.region, to: "/services" as const })),
       ...state.simulations.map((s) => ({ id: s.id, label: s.reference, meta: `${s.type} · ${s.ville}`, to: "/simulations" as const })),
-      ...state.utilisateurs.map((u) => ({ id: u.id, label: u.nom, meta: u.email, to: "/utilisateurs" as const })),
     ],
     [state],
   );
@@ -375,7 +368,7 @@ function GlobalSearch({ id }: { id?: string }) {
           setQuery(v);
           setOpen(true);
         }}
-        placeholder="Rechercher une API, un service, une simulation…"
+        placeholder="Rechercher une simulation, une référence…"
       />
       {open && query.trim().length > 0 && (
         <>
@@ -511,6 +504,9 @@ export function AppShell({
                   <DropdownMenuItem onSelect={() => navigate({ to: "/parametres" })}>
                     <Settings className="mr-2 h-4 w-4" /> Paramètres
                   </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => navigate({ to: "/admin" })}>
+                    <ShieldCheck className="mr-2 h-4 w-4" /> Back-office (admin)
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="text-destructive" onSelect={() => navigate({ to: "/connexion" })}>
                     <LogOut className="mr-2 h-4 w-4" /> Se déconnecter
@@ -527,7 +523,7 @@ export function AppShell({
 
         <div className="mx-auto flex w-full max-w-[1600px] items-center gap-2 px-5 pt-4 text-sm sm:px-7">
           <Link to="/" className="text-muted-foreground transition-colors hover:text-foreground">
-            Back-office
+            Espace client
           </Link>
           <span className="text-muted-foreground/50">/</span>
           <span className="truncate font-semibold">{current.label}</span>
