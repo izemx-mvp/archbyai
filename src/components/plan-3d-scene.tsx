@@ -917,6 +917,7 @@ export default function Plan3DScene({
           />
           {!ghost && <Camera vue={vue} rayon={rayon} controls={controls} />}
           <GhostControls actif={ghost} vitesse={Math.max(6, rayon * 0.55)} />
+          <CaptureScene cible={sceneRef} />
         </Suspense>
       </Canvas>
 
