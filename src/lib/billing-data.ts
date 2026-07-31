@@ -51,6 +51,8 @@ export type ClientCompte = {
   societe: string;
   role: "Administrateur" | "Architecte" | "Utilisateur";
   statut: "actif" | "suspendu" | "invite";
+  /** Espace d'appartenance : membre du back-office ou client du front-office. */
+  espace: "back-office" | "client";
   inscription: string;
   derniereActivite: string;
 };
@@ -119,20 +121,20 @@ export const plans: PlanTarif[] = [
 export const planParId = (id: PlanId) => plans.find((p) => p.id === id)!;
 
 export const clients: ClientCompte[] = [
-  { id: "CLI-001", nom: "Mohamed Toufella", email: "mohamed.toufella@laposte.net", societe: "ArchbyAI", role: "Administrateur", statut: "actif", inscription: "04/01/2026", derniereActivite: "29/07/2026 14:40" },
-  { id: "CLI-002", nom: "Salma El Amrani", email: "s.elamrani@atlas-immo.ma", societe: "Atlas Immobilier", role: "Architecte", statut: "actif", inscription: "12/01/2026", derniereActivite: "29/07/2026 09:18" },
-  { id: "CLI-003", nom: "Youssef Bennani", email: "y.bennani@cabinet-bennani.ma", societe: "Cabinet Bennani", role: "Architecte", statut: "actif", inscription: "23/01/2026", derniereActivite: "28/07/2026 17:45" },
-  { id: "CLI-004", nom: "Nadia Tazi", email: "n.tazi@residences-anfa.ma", societe: "Résidences Anfa", role: "Utilisateur", statut: "invite", inscription: "02/02/2026", derniereActivite: "—" },
-  { id: "CLI-005", nom: "Hamza Idrissi", email: "h.idrissi@sahara-build.ma", societe: "Sahara Build", role: "Utilisateur", statut: "suspendu", inscription: "17/02/2026", derniereActivite: "12/07/2026 08:30" },
-  { id: "CLI-006", nom: "Imane Cherkaoui", email: "i.cherkaoui@ville-casablanca.ma", societe: "Ville de Casablanca", role: "Architecte", statut: "actif", inscription: "05/03/2026", derniereActivite: "29/07/2026 08:05" },
-  { id: "CLI-007", nom: "Karim Belhaj", email: "k.belhaj@studio-medina.ma", societe: "Studio Medina", role: "Utilisateur", statut: "actif", inscription: "21/03/2026", derniereActivite: "28/07/2026 19:22" },
-  { id: "CLI-008", nom: "Omar Sbai", email: "o.sbai@sahara-build.ma", societe: "Sahara Build", role: "Architecte", statut: "actif", inscription: "09/04/2026", derniereActivite: "27/07/2026 15:47" },
-  { id: "CLI-009", nom: "Leila Fassi", email: "l.fassi@residences-anfa.ma", societe: "Résidences Anfa", role: "Utilisateur", statut: "suspendu", inscription: "28/04/2026", derniereActivite: "02/07/2026 10:11" },
-  { id: "CLI-010", nom: "Fatima Zahra Ouali", email: "fz.ouali@atlas-immo.ma", societe: "Atlas Immobilier", role: "Utilisateur", statut: "actif", inscription: "11/05/2026", derniereActivite: "26/07/2026 12:03" },
-  { id: "CLI-011", nom: "Taha Toufella", email: "taha.toufella@archbyai.ma", societe: "ArchbyAI", role: "Administrateur", statut: "actif", inscription: "04/01/2026", derniereActivite: "29/07/2026 11:02" },
-  { id: "CLI-012", nom: "Rachid Amrani", email: "r.amrani@medina-dev.ma", societe: "Medina Développement", role: "Architecte", statut: "actif", inscription: "02/06/2026", derniereActivite: "25/07/2026 16:31" },
-  { id: "CLI-013", nom: "Sofia Berrada", email: "s.berrada@ville-rabat.ma", societe: "Ville de Rabat", role: "Utilisateur", statut: "actif", inscription: "19/06/2026", derniereActivite: "24/07/2026 10:47" },
-  { id: "CLI-014", nom: "Anas Moukhliss", email: "a.moukhliss@atlantic-build.ma", societe: "Atlantic Build", role: "Architecte", statut: "invite", inscription: "07/07/2026", derniereActivite: "—" },
+  { id: "CLI-001", nom: "Mohamed Toufella", email: "mohamed.toufella@laposte.net", societe: "ArchbyAI", role: "Administrateur", statut: "actif", espace: "back-office", inscription: "04/01/2026", derniereActivite: "29/07/2026 14:40" },
+  { id: "CLI-002", nom: "Salma El Amrani", email: "s.elamrani@atlas-immo.ma", societe: "Atlas Immobilier", role: "Architecte", statut: "actif", espace: "client", inscription: "12/01/2026", derniereActivite: "29/07/2026 09:18" },
+  { id: "CLI-003", nom: "Youssef Bennani", email: "y.bennani@cabinet-bennani.ma", societe: "Cabinet Bennani", role: "Architecte", statut: "actif", espace: "client", inscription: "23/01/2026", derniereActivite: "28/07/2026 17:45" },
+  { id: "CLI-004", nom: "Nadia Tazi", email: "n.tazi@residences-anfa.ma", societe: "Résidences Anfa", role: "Utilisateur", statut: "invite", espace: "client", inscription: "02/02/2026", derniereActivite: "—" },
+  { id: "CLI-005", nom: "Hamza Idrissi", email: "h.idrissi@sahara-build.ma", societe: "Sahara Build", role: "Utilisateur", statut: "suspendu", espace: "client", inscription: "17/02/2026", derniereActivite: "12/07/2026 08:30" },
+  { id: "CLI-006", nom: "Imane Cherkaoui", email: "i.cherkaoui@ville-casablanca.ma", societe: "Ville de Casablanca", role: "Architecte", statut: "actif", espace: "client", inscription: "05/03/2026", derniereActivite: "29/07/2026 08:05" },
+  { id: "CLI-007", nom: "Karim Belhaj", email: "k.belhaj@studio-medina.ma", societe: "Studio Medina", role: "Utilisateur", statut: "actif", espace: "client", inscription: "21/03/2026", derniereActivite: "28/07/2026 19:22" },
+  { id: "CLI-008", nom: "Omar Sbai", email: "o.sbai@sahara-build.ma", societe: "Sahara Build", role: "Architecte", statut: "actif", espace: "client", inscription: "09/04/2026", derniereActivite: "27/07/2026 15:47" },
+  { id: "CLI-009", nom: "Leila Fassi", email: "l.fassi@residences-anfa.ma", societe: "Résidences Anfa", role: "Utilisateur", statut: "suspendu", espace: "client", inscription: "28/04/2026", derniereActivite: "02/07/2026 10:11" },
+  { id: "CLI-010", nom: "Fatima Zahra Ouali", email: "fz.ouali@atlas-immo.ma", societe: "Atlas Immobilier", role: "Utilisateur", statut: "actif", espace: "client", inscription: "11/05/2026", derniereActivite: "26/07/2026 12:03" },
+  { id: "CLI-011", nom: "Taha Toufella", email: "taha.toufella@archbyai.ma", societe: "ArchbyAI", role: "Administrateur", statut: "actif", espace: "back-office", inscription: "04/01/2026", derniereActivite: "29/07/2026 11:02" },
+  { id: "CLI-012", nom: "Rachid Amrani", email: "r.amrani@medina-dev.ma", societe: "Medina Développement", role: "Architecte", statut: "actif", espace: "client", inscription: "02/06/2026", derniereActivite: "25/07/2026 16:31" },
+  { id: "CLI-013", nom: "Sofia Berrada", email: "s.berrada@ville-rabat.ma", societe: "Ville de Rabat", role: "Utilisateur", statut: "actif", espace: "client", inscription: "19/06/2026", derniereActivite: "24/07/2026 10:47" },
+  { id: "CLI-014", nom: "Anas Moukhliss", email: "a.moukhliss@atlantic-build.ma", societe: "Atlantic Build", role: "Architecte", statut: "invite", espace: "client", inscription: "07/07/2026", derniereActivite: "—" },
 ];
 
 export const abonnementsClients: AbonnementClient[] = [
