@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Download } from "lucide-react";
 import { toast } from "sonner";
 
-import { AppShell } from "@/components/app-shell";
+import { AdminShell } from "@/components/admin-shell";
 import { DataTable, type Column } from "@/components/data-table";
 import { PageHeader } from "@/components/page-parts";
 import { StatusPill } from "@/components/status-pill";
@@ -74,7 +74,7 @@ function HistoriquePage() {
   ];
 
   return (
-    <AppShell>
+    <AdminShell>
       <PageHeader
         titre="Historique des appels"
         description="Supervisez l'historique, l'état et le statut des API de la plateforme."
@@ -109,6 +109,6 @@ function HistoriquePage() {
         emptyTitle="Aucun appel enregistré"
         emptyDescription="Aucun appel ne correspond à vos critères de recherche."
       />
-    </AppShell>
+    </AdminShell>
   );
 }

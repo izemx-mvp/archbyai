@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Cpu, Power, RefreshCw, Server } from "lucide-react";
 import { toast } from "sonner";
 
-import { AppShell } from "@/components/app-shell";
+import { AdminShell } from "@/components/admin-shell";
 import { PageHeader } from "@/components/page-parts";
 import { StatusPill, type Tone } from "@/components/status-pill";
 import { Button } from "@/components/ui/button";
@@ -70,19 +70,19 @@ function ServicesPage() {
 
   if (loading) {
     return (
-      <AppShell>
+      <AdminShell>
         <PageHeader titre="Services" description="Démarrez, arrêtez et supervisez l'état des services de la plateforme." />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="skeleton-brand h-64 w-full rounded-2xl" />
           ))}
         </div>
-      </AppShell>
+      </AdminShell>
     );
   }
 
   return (
-    <AppShell>
+    <AdminShell>
       <PageHeader
         titre="Services"
         description="Démarrez, arrêtez et supervisez l'état des services de la plateforme."
@@ -165,6 +165,6 @@ function ServicesPage() {
           </article>
         ))}
       </div>
-    </AppShell>
+    </AdminShell>
   );
 }

@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Download, Pause, Pencil, Play, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { AppShell } from "@/components/app-shell";
+import { AdminShell } from "@/components/admin-shell";
 import { DataTable, type Column } from "@/components/data-table";
 import { PageHeader } from "@/components/page-parts";
 import { StatusPill, type Tone } from "@/components/status-pill";
@@ -234,7 +234,7 @@ function AbonnementsPage() {
   };
 
   return (
-    <AppShell>
+    <AdminShell>
       <PageHeader
         titre="Abonnements API"
         description="Gérez les abonnements aux API de la plateforme, leurs quotas et leurs plans."
@@ -389,6 +389,6 @@ function AbonnementsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </AppShell>
+    </AdminShell>
   );
 }
