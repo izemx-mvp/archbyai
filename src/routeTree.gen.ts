@@ -9,17 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as UtilisateursRouteImport } from './routes/utilisateurs'
 import { Route as TarifsRouteImport } from './routes/tarifs'
 import { Route as SimulationsRouteImport } from './routes/simulations'
-import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ParametresRouteImport } from './routes/parametres'
 import { Route as NouvelleSimulationRouteImport } from './routes/nouvelle-simulation'
 import { Route as MonAbonnementRouteImport } from './routes/mon-abonnement'
-import { Route as HistoriqueRouteImport } from './routes/historique'
 import { Route as ConnexionRouteImport } from './routes/connexion'
 import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AbonnementsRouteImport } from './routes/abonnements'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as PlanReferenceRouteImport } from './routes/plan.$reference'
@@ -28,11 +24,6 @@ import { Route as AdminAbonnementsRouteImport } from './routes/admin.abonnements
 import { Route as AdminUtilisateursIndexRouteImport } from './routes/admin.utilisateurs.index'
 import { Route as AdminUtilisateursIdRouteImport } from './routes/admin.utilisateurs.$id'
 
-const UtilisateursRoute = UtilisateursRouteImport.update({
-  id: '/utilisateurs',
-  path: '/utilisateurs',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const TarifsRoute = TarifsRouteImport.update({
   id: '/tarifs',
   path: '/tarifs',
@@ -41,11 +32,6 @@ const TarifsRoute = TarifsRouteImport.update({
 const SimulationsRoute = SimulationsRouteImport.update({
   id: '/simulations',
   path: '/simulations',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ServicesRoute = ServicesRouteImport.update({
-  id: '/services',
-  path: '/services',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ParametresRoute = ParametresRouteImport.update({
@@ -63,11 +49,6 @@ const MonAbonnementRoute = MonAbonnementRouteImport.update({
   path: '/mon-abonnement',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HistoriqueRoute = HistoriqueRouteImport.update({
-  id: '/historique',
-  path: '/historique',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ConnexionRoute = ConnexionRouteImport.update({
   id: '/connexion',
   path: '/connexion',
@@ -76,11 +57,6 @@ const ConnexionRoute = ConnexionRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AbonnementsRoute = AbonnementsRouteImport.update({
-  id: '/abonnements',
-  path: '/abonnements',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -121,17 +97,13 @@ const AdminUtilisateursIdRoute = AdminUtilisateursIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/abonnements': typeof AbonnementsRoute
   '/admin': typeof AdminRouteWithChildren
   '/connexion': typeof ConnexionRoute
-  '/historique': typeof HistoriqueRoute
   '/mon-abonnement': typeof MonAbonnementRoute
   '/nouvelle-simulation': typeof NouvelleSimulationRoute
   '/parametres': typeof ParametresRoute
-  '/services': typeof ServicesRoute
   '/simulations': typeof SimulationsRoute
   '/tarifs': typeof TarifsRoute
-  '/utilisateurs': typeof UtilisateursRoute
   '/admin/abonnements': typeof AdminAbonnementsRoute
   '/admin/paiements': typeof AdminPaiementsRoute
   '/plan/$reference': typeof PlanReferenceRoute
@@ -141,16 +113,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/abonnements': typeof AbonnementsRoute
   '/connexion': typeof ConnexionRoute
-  '/historique': typeof HistoriqueRoute
   '/mon-abonnement': typeof MonAbonnementRoute
   '/nouvelle-simulation': typeof NouvelleSimulationRoute
   '/parametres': typeof ParametresRoute
-  '/services': typeof ServicesRoute
   '/simulations': typeof SimulationsRoute
   '/tarifs': typeof TarifsRoute
-  '/utilisateurs': typeof UtilisateursRoute
   '/admin/abonnements': typeof AdminAbonnementsRoute
   '/admin/paiements': typeof AdminPaiementsRoute
   '/plan/$reference': typeof PlanReferenceRoute
@@ -161,17 +129,13 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/abonnements': typeof AbonnementsRoute
   '/admin': typeof AdminRouteWithChildren
   '/connexion': typeof ConnexionRoute
-  '/historique': typeof HistoriqueRoute
   '/mon-abonnement': typeof MonAbonnementRoute
   '/nouvelle-simulation': typeof NouvelleSimulationRoute
   '/parametres': typeof ParametresRoute
-  '/services': typeof ServicesRoute
   '/simulations': typeof SimulationsRoute
   '/tarifs': typeof TarifsRoute
-  '/utilisateurs': typeof UtilisateursRoute
   '/admin/abonnements': typeof AdminAbonnementsRoute
   '/admin/paiements': typeof AdminPaiementsRoute
   '/plan/$reference': typeof PlanReferenceRoute
@@ -183,17 +147,13 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/abonnements'
     | '/admin'
     | '/connexion'
-    | '/historique'
     | '/mon-abonnement'
     | '/nouvelle-simulation'
     | '/parametres'
-    | '/services'
     | '/simulations'
     | '/tarifs'
-    | '/utilisateurs'
     | '/admin/abonnements'
     | '/admin/paiements'
     | '/plan/$reference'
@@ -203,16 +163,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/abonnements'
     | '/connexion'
-    | '/historique'
     | '/mon-abonnement'
     | '/nouvelle-simulation'
     | '/parametres'
-    | '/services'
     | '/simulations'
     | '/tarifs'
-    | '/utilisateurs'
     | '/admin/abonnements'
     | '/admin/paiements'
     | '/plan/$reference'
@@ -222,17 +178,13 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/abonnements'
     | '/admin'
     | '/connexion'
-    | '/historique'
     | '/mon-abonnement'
     | '/nouvelle-simulation'
     | '/parametres'
-    | '/services'
     | '/simulations'
     | '/tarifs'
-    | '/utilisateurs'
     | '/admin/abonnements'
     | '/admin/paiements'
     | '/plan/$reference'
@@ -243,29 +195,18 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AbonnementsRoute: typeof AbonnementsRoute
   AdminRoute: typeof AdminRouteWithChildren
   ConnexionRoute: typeof ConnexionRoute
-  HistoriqueRoute: typeof HistoriqueRoute
   MonAbonnementRoute: typeof MonAbonnementRoute
   NouvelleSimulationRoute: typeof NouvelleSimulationRoute
   ParametresRoute: typeof ParametresRoute
-  ServicesRoute: typeof ServicesRoute
   SimulationsRoute: typeof SimulationsRoute
   TarifsRoute: typeof TarifsRoute
-  UtilisateursRoute: typeof UtilisateursRoute
   PlanReferenceRoute: typeof PlanReferenceRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/utilisateurs': {
-      id: '/utilisateurs'
-      path: '/utilisateurs'
-      fullPath: '/utilisateurs'
-      preLoaderRoute: typeof UtilisateursRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/tarifs': {
       id: '/tarifs'
       path: '/tarifs'
@@ -278,13 +219,6 @@ declare module '@tanstack/react-router' {
       path: '/simulations'
       fullPath: '/simulations'
       preLoaderRoute: typeof SimulationsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/services': {
-      id: '/services'
-      path: '/services'
-      fullPath: '/services'
-      preLoaderRoute: typeof ServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/parametres': {
@@ -308,13 +242,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MonAbonnementRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/historique': {
-      id: '/historique'
-      path: '/historique'
-      fullPath: '/historique'
-      preLoaderRoute: typeof HistoriqueRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/connexion': {
       id: '/connexion'
       path: '/connexion'
@@ -327,13 +254,6 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/abonnements': {
-      id: '/abonnements'
-      path: '/abonnements'
-      fullPath: '/abonnements'
-      preLoaderRoute: typeof AbonnementsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -408,19 +328,25 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AbonnementsRoute: AbonnementsRoute,
   AdminRoute: AdminRouteWithChildren,
   ConnexionRoute: ConnexionRoute,
-  HistoriqueRoute: HistoriqueRoute,
   MonAbonnementRoute: MonAbonnementRoute,
   NouvelleSimulationRoute: NouvelleSimulationRoute,
   ParametresRoute: ParametresRoute,
-  ServicesRoute: ServicesRoute,
   SimulationsRoute: SimulationsRoute,
   TarifsRoute: TarifsRoute,
-  UtilisateursRoute: UtilisateursRoute,
   PlanReferenceRoute: PlanReferenceRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
