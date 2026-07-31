@@ -500,9 +500,10 @@ export function AppShell({
                   <DropdownMenuItem onSelect={() => navigate({ to: "/parametres" })}>
                     <Settings className="mr-2 h-4 w-4" /> Paramètres
                   </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => navigate({ to: "/admin" })}>
-                    <ShieldCheck className="mr-2 h-4 w-4" /> Back-office (admin)
+                  <DropdownMenuItem onSelect={() => navigate({ to: "/connexion" })}>
+                    <ShieldCheck className="mr-2 h-4 w-4" /> Changer d'espace
                   </DropdownMenuItem>
+
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="text-destructive" onSelect={() => navigate({ to: "/connexion" })}>
                     <LogOut className="mr-2 h-4 w-4" /> Se déconnecter
