@@ -785,6 +785,22 @@ export default function Plan3DScene({
   const [ghost, setGhost] = useState(false);
   const [pleinEcran, setPleinEcran] = useState(false);
   const controls = useRef<OrbitControlsImpl | null>(null);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const [export3D, setExport3D] = useState<null | "obj" | "glb">(null);
+
+  /** Export du modèle vers un format 3D lisible par Adobe (Dimension, Substance, Aero). */
+  const exporterModele = async (format: "obj" | "glb") => {
+    const scene = sceneRef.current;
+    if (!scene || export3D) return;
+    setExport3D(format);
+    const nom = `maquette-3d-${simulation.reference}`;
+    try {
+      if (format === "obj") await exporterOBJ(scene, nom);
+      else await exporterGLB(scene, nom);
+    } finally {
+      setExport3D(null);
+    }
+  };
 
   useEffect(() => {
     if (!pleinEcran) return;
