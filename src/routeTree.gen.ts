@@ -23,6 +23,7 @@ import { Route as AbonnementsRouteImport } from './routes/abonnements'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as PlanReferenceRouteImport } from './routes/plan.$reference'
+import { Route as AdminPaiementsRouteImport } from './routes/admin.paiements'
 import { Route as AdminAbonnementsRouteImport } from './routes/admin.abonnements'
 import { Route as AdminUtilisateursIndexRouteImport } from './routes/admin.utilisateurs.index'
 import { Route as AdminUtilisateursIdRouteImport } from './routes/admin.utilisateurs.$id'
@@ -97,6 +98,11 @@ const PlanReferenceRoute = PlanReferenceRouteImport.update({
   path: '/plan/$reference',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminPaiementsRoute = AdminPaiementsRouteImport.update({
+  id: '/paiements',
+  path: '/paiements',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAbonnementsRoute = AdminAbonnementsRouteImport.update({
   id: '/abonnements',
   path: '/abonnements',
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/tarifs': typeof TarifsRoute
   '/utilisateurs': typeof UtilisateursRoute
   '/admin/abonnements': typeof AdminAbonnementsRoute
+  '/admin/paiements': typeof AdminPaiementsRoute
   '/plan/$reference': typeof PlanReferenceRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/utilisateurs/$id': typeof AdminUtilisateursIdRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/tarifs': typeof TarifsRoute
   '/utilisateurs': typeof UtilisateursRoute
   '/admin/abonnements': typeof AdminAbonnementsRoute
+  '/admin/paiements': typeof AdminPaiementsRoute
   '/plan/$reference': typeof PlanReferenceRoute
   '/admin': typeof AdminIndexRoute
   '/admin/utilisateurs/$id': typeof AdminUtilisateursIdRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/tarifs': typeof TarifsRoute
   '/utilisateurs': typeof UtilisateursRoute
   '/admin/abonnements': typeof AdminAbonnementsRoute
+  '/admin/paiements': typeof AdminPaiementsRoute
   '/plan/$reference': typeof PlanReferenceRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/utilisateurs/$id': typeof AdminUtilisateursIdRoute
@@ -186,6 +195,7 @@ export interface FileRouteTypes {
     | '/tarifs'
     | '/utilisateurs'
     | '/admin/abonnements'
+    | '/admin/paiements'
     | '/plan/$reference'
     | '/admin/'
     | '/admin/utilisateurs/$id'
@@ -204,6 +214,7 @@ export interface FileRouteTypes {
     | '/tarifs'
     | '/utilisateurs'
     | '/admin/abonnements'
+    | '/admin/paiements'
     | '/plan/$reference'
     | '/admin'
     | '/admin/utilisateurs/$id'
@@ -223,6 +234,7 @@ export interface FileRouteTypes {
     | '/tarifs'
     | '/utilisateurs'
     | '/admin/abonnements'
+    | '/admin/paiements'
     | '/plan/$reference'
     | '/admin/'
     | '/admin/utilisateurs/$id'
@@ -345,6 +357,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlanReferenceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/paiements': {
+      id: '/admin/paiements'
+      path: '/paiements'
+      fullPath: '/admin/paiements'
+      preLoaderRoute: typeof AdminPaiementsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/abonnements': {
       id: '/admin/abonnements'
       path: '/abonnements'
@@ -371,6 +390,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminAbonnementsRoute: typeof AdminAbonnementsRoute
+  AdminPaiementsRoute: typeof AdminPaiementsRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminUtilisateursIdRoute: typeof AdminUtilisateursIdRoute
   AdminUtilisateursIndexRoute: typeof AdminUtilisateursIndexRoute
@@ -378,6 +398,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAbonnementsRoute: AdminAbonnementsRoute,
+  AdminPaiementsRoute: AdminPaiementsRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminUtilisateursIdRoute: AdminUtilisateursIdRoute,
   AdminUtilisateursIndexRoute: AdminUtilisateursIndexRoute,

@@ -15,6 +15,7 @@ import { ThemeProvider, themeInitScript } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { DataProvider } from "@/lib/store";
+import { BillingProvider } from "@/lib/billing-store";
 
 function NotFoundComponent() {
   return (
