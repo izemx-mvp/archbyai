@@ -12,17 +12,20 @@ import {
   abonnementsClients as abonnementsSeed,
   clients as clientsSeed,
   moyensPaiementSeed,
+  plans as plansSeed,
   transactions as transactionsSeed,
   type AbonnementClient,
   type ClientCompte,
   type MoyenPaiement,
   type PlanId,
+  type PlanTarif,
   type Periodicite,
   type StatutAbonnement,
   type Transaction,
 } from "@/lib/billing-data";
 
 type BillingState = {
+  plans: PlanTarif[];
   clients: ClientCompte[];
   abonnements: AbonnementClient[];
   transactions: Transaction[];
@@ -32,6 +35,7 @@ type BillingState = {
 const STORAGE_KEY = "archbyai-billing-v1";
 
 const initialState: BillingState = {
+  plans: plansSeed,
   clients: clientsSeed,
   abonnements: abonnementsSeed,
   transactions: transactionsSeed,
@@ -47,6 +51,10 @@ const dansNJours = (n: number) => dateFr(new Date(Date.now() + n * 86400000));
 type Ctx = {
   state: BillingState;
   ready: boolean;
+  // plans tarifaires
+  creerPlan: (input: PlanTarif) => void;
+  majPlan: (id: string, patch: Partial<PlanTarif>) => void;
+  supprimerPlan: (id: string) => void;
   // abonnements
   creerAbonnement: (input: Omit<AbonnementClient, "id">) => AbonnementClient;
   majAbonnement: (id: string, patch: Partial<AbonnementClient>) => void;
@@ -106,6 +114,9 @@ export function BillingProvider({ children }: { children: ReactNode }) {
     () => ({
       state,
       ready,
+      creerPlan: (input) => setState((s) => ({ ...s, plans: [...s.plans, input] })),
+      majPlan: (id, patch) => setState((s) => ({ ...s, plans: patchList(s.plans, id, patch) })),
+      supprimerPlan: (id) => setState((s) => ({ ...s, plans: s.plans.filter((p) => p.id !== id) })),
       creerAbonnement: (input) => {
         const cree: AbonnementClient = { ...input, id: `SUB-${Math.floor(5000 + Math.random() * 4000)}` };
         setState((s) => ({ ...s, abonnements: [cree, ...s.abonnements] }));

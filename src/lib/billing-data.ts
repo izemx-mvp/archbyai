@@ -1,6 +1,6 @@
 /** Données de démonstration pour la facturation ArchbyAI (front-only, aucune API réelle). */
 
-export type PlanId = "decouverte" | "pro" | "entreprise";
+export type PlanId = "decouverte" | "pro" | "entreprise" | (string & {});
 
 export type PlanTarif = {
   id: PlanId;
@@ -118,7 +118,18 @@ export const plans: PlanTarif[] = [
   },
 ];
 
-export const planParId = (id: PlanId) => plans.find((p) => p.id === id)!;
+export const planVide: PlanTarif = {
+  id: "inconnu",
+  nom: "Plan supprimé",
+  accroche: "",
+  prixMensuel: 0,
+  prixAnnuel: 0,
+  simulations: "—",
+  fonctionnalites: [],
+};
+
+export const planParId = (id: PlanId, liste: PlanTarif[] = plans) =>
+  liste.find((p) => p.id === id) ?? { ...planVide, id: String(id) };
 
 export const clients: ClientCompte[] = [
   { id: "CLI-001", nom: "Mohamed Toufella", email: "mohamed.toufella@laposte.net", societe: "ArchbyAI", role: "Administrateur", statut: "actif", espace: "back-office", inscription: "04/01/2026", derniereActivite: "29/07/2026 14:40" },
