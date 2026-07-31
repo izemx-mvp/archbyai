@@ -164,7 +164,7 @@ function MonAbonnementPage() {
             <div>
               <p className="text-sm font-medium text-muted-foreground">Votre plan</p>
               <h2 className="mt-1 text-2xl font-extrabold tracking-tight">Plan {plan.nom}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{plan.simulations} · facturation {abonnement.periodicite}e</p>
+              <p className="mt-1 text-sm text-muted-foreground">{plan.simulations} · facturation {abonnement.periodicite === "mensuel" ? "mensuelle" : "annuelle"}</p>
             </div>
             <StatusPill tone={statutMap[abonnement.statut].tone}>{statutMap[abonnement.statut].label}</StatusPill>
           </div>
